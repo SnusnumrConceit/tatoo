@@ -1,0 +1,125 @@
+<template>
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group col-4">
+                <label for="">Клиент</label>
+                <select class="form-control" v-model="order.client">
+                    <option :value="client.id"
+                            v-for="client in clients"
+                            :key="client.id">
+                        {{ client.name }}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group col-4">
+                <label for="">Таутировка</label>
+                <select class="form-control" v-model="order.tatoo">
+                    <option :value="tatoo.id"
+                            v-for="tatoo in clients"
+                            :key="tatoo.id">
+                        {{ tatoo.name }}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group col-4">
+                <label for="">Дата рождения</label>
+                <datepicker v-model="order.note_date"
+                            :monday-first="true"
+                            :bootstrap-styling="true"
+                            :language="ru">
+                </datepicker>
+            </div>
+            <div class="form-group col-4">
+                <button class="btn btn-outline-success" v-if="$route.params.id" @click="save">
+                    Сохранить
+                </button>
+                <button class="btn btn-outline-success" @click="save" v-else>
+                    Добавить
+                </button>
+                <button class="btn btn-outline-secondary" @click="$router.push({ name: 'orders' })">
+                    Отмена
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+  import Datepicker from 'vuejs-datepicker';
+  import {ru,en} from 'vuejs-datepicker/dist/locale';
+
+  export default {
+    name: "order_form",
+    components: {Datepicker},
+    data() {
+      return {
+        order: {
+          name: '',
+          client: '',
+          tatoo: '',
+          note_date: Date.now()
+        },
+
+        clients: [],
+        tatoos: [],
+
+        ru: ru,
+        en: en
+      }
+    },
+    methods: {
+      async save() {
+        if (this.$route.params.id) {
+          const response = await axios.post('/orders/update/' + this.$route.params.id, this.order);
+          if (response.status !== 200 || response.data.status === 'error') {
+            this.$swal('Ошибка!', response.data.msg, 'error');
+            return false;
+          }
+          this.$swal('Успешно!', response.data.msg, 'success');
+          this.$router.push({ name: 'orders' });
+          return true;
+        } else {
+          const response = await axios.post('/orders/create', this.order);
+          if (response.status !== 200 || response.data.status === 'error') {
+            this.$swal('Ошибка!', response.data.msg, 'error');
+            return false;
+          }
+          this.$swal('Успешно!', response.data.msg, 'success');
+          this.$router.push({ name: 'orders' });
+          return true;
+        }
+      },
+
+      async loadData() {
+        const response = await axios.get('/orders/edit/' + this.$route.params.id);
+        if (response.status !== 200 || response.data.status === 'error') {
+          this.$swal('Ошибка!', response.data.msg, 'error');
+          return false;
+        }
+        this.order = response.data.order;
+        return true;
+      },
+
+      async loadExtendsData() {
+        const response = await axios.get('/orders/extends');
+        if (response.status !== 200 || response.data.status === 'error') {
+          this.$swal('Ошибка!', response.data.msg, 'error');
+          return false;
+        }
+        this.clients = response.data.clients;
+        this.tatoos = response.data.tatoos;
+        return true;
+      }
+
+    },
+    created() {
+      if (this.$route.params.id) {
+        this.loadData();
+      }
+    }
+  }
+</script>
+
+<style scoped>
+
+</style>
