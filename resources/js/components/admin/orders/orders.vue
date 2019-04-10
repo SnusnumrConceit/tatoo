@@ -4,7 +4,7 @@
             <div class="col-lg-12">
                 <div class="row">
                     <div class="col-md-4">
-                        <h2 class="title-1 m-b-25">Пользователи</h2>
+                        <h2 class="title-1 m-b-25">Заказы</h2>
                     </div>
                     <div class="col-1">
                         <button class="btn btn-outline-success" @click="$router.push({ path: '/orders/create' })">
@@ -34,36 +34,50 @@
                     <table class="table table-borderless table-striped table-earning">
                         <thead>
                         <th @click="setFilter('name')" class="text-left">
-                            Name
+                            Клиент
                             <i class="fa fa-sort-amount-up" v-if="filter.name === 'name' && filter.type === 'DESC'"></i>
                             <i class="fa fa-sort-amount-down" v-else-if="filter.name === 'name' && filter.type === 'ASC'"></i>
                         </th>
-                        <th @click="setFilter('email')" class="text-left">
-                            email
-                            <i class="fa fa-sort-amount-up" v-if="filter.name === 'email' && filter.type === 'DESC'"></i>
-                            <i class="fa fa-sort-amount-down" v-else-if="filter.name === 'email' && filter.type === 'ASC'"></i>
+                        <th @click="setFilter('tatoo')" class="text-left">
+                            Тату
+                            <i class="fa fa-sort-amount-up" v-if="filter.name === 'tatoo' && filter.type === 'DESC'"></i>
+                            <i class="fa fa-sort-amount-down" v-else-if="filter.name === 'tatoo' && filter.type === 'ASC'"></i>
                         </th>
-                        <th @click="setFilter('birthday')" class="text-left">
-                            Дата рождения
-                            <i class="fa fa-sort-amount-up" v-if="filter.name === 'birthday' && filter.type === 'DESC'"></i>
-                            <i class="fa fa-sort-amount-down" v-else-if="filter.name === 'birthday' && filter.type === 'ASC'"></i>
+                        <th @click="setFilter('price')" class="text-left">
+                            Цена
+                            <i class="fa fa-sort-amount-up" v-if="filter.name === 'price' && filter.type === 'DESC'"></i>
+                            <i class="fa fa-sort-amount-down" v-else-if="filter.name === 'price' && filter.type === 'ASC'"></i>
+                        </th>
+                        <th @click="setFilter('note_date')" class="text-left">
+                            На какое время
+                            <i class="fa fa-sort-amount-up" v-if="filter.name === 'note_date' && filter.type === 'DESC'"></i>
+                            <i class="fa fa-sort-amount-down" v-else-if="filter.name === 'note_date' && filter.type === 'ASC'"></i>
+                        </th>
+                        <th @click="setFilter('status')" class="text-left">
+                            Статус
+                            <i class="fa fa-sort-amount-up" v-if="filter.name === 'status' && filter.type === 'DESC'"></i>
+                            <i class="fa fa-sort-amount-down" v-else-if="filter.name === 'status' && filter.type === 'ASC'"></i>
                         </th>
                         <th @click="setFilter('created_at')" class="text-left">
-                            Дата регистрации
+                            Время заказа
                             <i class="fa fa-sort-amount-up" v-if="filter.name === 'created_at' && filter.type === 'DESC'"></i>
                             <i class="fa fa-sort-amount-down" v-else-if="filter.name === 'created_at' && filter.type === 'ASC'"></i>
                         </th>
                         <th></th>
                         </thead>
-                        <tbody v-for="(order, index) in orders" :key="order.id">
-                        <td>{{ order.name }}</td>
-                        <td>{{ order.email }} </td>
-                        <td>{{ order.birthday }} </td>
-                        <td>{{ order.created_at }} </td>
-                        <td>
-                            <i class="fa fa-cog text-success" @click="$router.push({path: '/orders/' + order.id})"></i>
-                            <i class="fa fa-trash text-danger" @click="remove(index, order.id)"></i>
-                        </td>
+                        <tbody>
+                            <tr v-for="(order, index) in orders" :key="order.id">
+                                <td @click="showModal(order.id)">{{ order.customer }}</td>
+                                <td>{{ order.tatoo }} </td>
+                                <td>{{ order.price }}</td>
+                                <td>{{ order.note_date }} </td>
+                                <td>{{ order.status_type }}</td>
+                                <td>{{ order.created_at }} </td>
+                                <td>
+                                    <i class="fa fa-cog text-success" @click="$router.push({path: '/orders/' + order.id})"></i>
+                                    <i class="fa fa-trash text-danger" @click="remove(index, order.id)"></i>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <paginate v-model="pagination.page"
@@ -83,6 +97,30 @@
                 <div class="alert alert-info" v-else>
                     По запросу {{ search.keyword }} не найдено ни одного пользователя
                 </div>
+                <modal name="order_info">
+                    <div class="modal-header" v-if="order_info.customer.length">
+                        <h2>
+                            {{ order_info.customer}} - {{ order_info.tatoo.name }}
+                        </h2>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-3">
+                                <img :src="order_info.url" alt="">
+                            </div>
+                            <div class="col-9">
+                                <div class="col-12">
+                                    <h3>Цена:</h3>
+                                    <p>{{ order_info.price }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <h3>Описание</h3>
+                                    {{ order_info.status}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </modal>
             </div>
         </div>
     </div>
@@ -113,6 +151,11 @@
           name: '',
           type: ''
         },
+
+        order_info: {
+          customer: {},
+          tatoo: {}
+        }
       }
     },
 
@@ -166,6 +209,11 @@
         this.switchPage(1);
       },
 
+      showModal(id) {
+        this.loadInfo(id);
+        this.$modal.show('order_info');
+      },
+
       async remove(index, id) {
         const response = await axios.post('/orders/remove/' + id);
         if (response.status !== 200 || response.data.status === 'error') {
@@ -191,6 +239,16 @@
           this.search.processing = false;
           this.orders = response.data.orders.data;
           this.pagination.last_page = response.data.orders.last_page;
+        }
+      },
+
+      async loadInfo(id) {
+        const response = await axios.get('/orders/info/' + id);
+        if (response.status !== 200 || !response.data.status === 'error') {
+          this.$swal('Ошибка!', response.data.msg, 'error');
+          return false;
+        } else {
+          this.order_info = response.data.order;
         }
       },
 

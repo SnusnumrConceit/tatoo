@@ -37,7 +37,7 @@ export const routes = [
   {
     name: 'tatoo_form',
     path: '/tatoos/create',
-    component: UserForm
+    component: TatooForm
   },
   {
     name: 'tatoo_form',

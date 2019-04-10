@@ -2,8 +2,8 @@
     <div class="row">
         <div class="col-12">
             <div class="form-group col-4">
-                <label for="">Имя</label>
-                <input type="email"
+                <label for="">Название</label>
+                <input type="text"
                        v-model="appointment.name"
                        class="form-control">
             </div>

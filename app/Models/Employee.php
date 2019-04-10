@@ -15,6 +15,10 @@ class Employee extends Model
 
     public function tatoos()
     {
-        return $this->belongsToMany(Tatoo::class, 'master_tatoos', 'employee_id', 'tatoo_id');
+        return $this->belongsToMany(
+            Tatoo::class,
+            'master_tatoos',
+            'employee_id',
+            'tatoo_id');
     }
 }

@@ -62,6 +62,7 @@ Route::group([
         ->where('id', '[0-9]+');
     Route::post('/remove/{id}', 'OrderController@destroy')
         ->where('id', '[0-9]+');
+    Route::get('/extends', 'OrderController@extends');
 });
 
 Route::group([
@@ -95,3 +96,13 @@ Route::group([
     Route::post('/remove/{id}', 'AppointmentController@destroy')
         ->where('id', '[0-9]+');
 });
+
+Route::group([
+    'prefix' => 'image'
+], function () {
+   Route::post('/upload', 'ImageController@upload');
+   Route::post('/remove', 'ImageController@remove');
+});
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Admin\Order\OrderFormRequest;
 use App\Model\Order;
+use App\Services\OrderService;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public $order;
+
+    public function __construct(OrderService $order)
     {
-        //
+        $this->order = $order;
     }
 
     /**
@@ -22,9 +21,9 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(OrderFormRequest $request)
     {
-        //
+        return $this->order->create($request);
     }
 
     /**
@@ -35,18 +34,12 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return $this->order->store($request);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Model\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Order $order)
+    public function search(Request $request)
     {
-        //
+        return $this->order->search($request);
     }
 
     /**
@@ -55,9 +48,19 @@ class OrderController extends Controller
      * @param  \App\Model\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function edit(Order $order)
+    public function edit(int $id)
     {
-        //
+        return $this->order->edit($id);
+    }
+
+    public function info(int $id)
+    {
+        return $this->order->info($id);
+    }
+
+    public function extends()
+    {
+        return $this->order->extends();
     }
 
     /**
@@ -67,9 +70,9 @@ class OrderController extends Controller
      * @param  \App\Model\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Order $order)
+    public function update(OrderFormRequest $request, int $id)
     {
-        //
+        return $this->order->update($request, $id);
     }
 
     /**
@@ -78,8 +81,8 @@ class OrderController extends Controller
      * @param  \App\Model\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Order $order)
+    public function destroy(int $id)
     {
-        //
+        return $this->order->destroy($id);
     }
 }

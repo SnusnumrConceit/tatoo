@@ -56,7 +56,7 @@
                             <th></th>
                         </thead>
                         <tbody v-for="(employee, index) in employees" :key="employee.id">
-                            <td>{{ employee.name }}</td>
+                            <td @click="showModal(employee.id)">{{ employee.name }}</td>
                             <td>{{ employee.appointment }} </td>
                             <td>{{ employee.birthday }} </td>
                             <td>{{ employee.created_at }} </td>
@@ -83,6 +83,35 @@
                 <div class="alert alert-info" v-else>
                     По запросу {{ search.keyword }} не найдено ни одного работника
                 </div>
+                <modal name="master_info">
+                    <div class="modal-header">
+                        <h2>
+                            {{ employee_info.name}}
+                        </h2>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-3">
+                                <img :src="employee_info.url" alt="">
+                            </div>
+                            <div class="col-9">
+                                <div class="col-12">
+                                    <h3>Должность:</h3>
+                                    <p>{{ employee_info.appointment }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <h3>Описание</h3>
+                                    {{ employee_info.description}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" v-if="employee_info.tatoos.length">
+                            <div class="col-12" v-for="tatoo in tatoos">
+                                {{ tatoo.name }}
+                            </div>
+                        </div>
+                    </div>
+                </modal>
             </div>
         </div>
     </div>
@@ -113,6 +142,10 @@
           name: '',
           type: ''
         },
+
+        employee_info:  {
+          tatoos: []
+        }
       }
     },
 
@@ -166,6 +199,11 @@
         this.switchPage(1);
       },
 
+      showModal(id) {
+        this.loadInfo(id);
+        this.$modal.show('master_info');
+      },
+
       async remove(index, id) {
         const response = await axios.post('/employees/remove/' + id);
         if (response.status !== 200 || response.data.status === 'error') {
@@ -201,6 +239,16 @@
         } else {
           this.employees = response.data.employees.data;
           this.pagination.last_page = response.data.employees.last_page;
+        }
+      },
+
+      async loadInfo(id) {
+        const response = await axios.get('/employees/info/' + id);
+        if (response.status !== 200 || !response.data.status === 'error') {
+          this.$swal('Ошибка!', response.data.msg, 'error');
+          return false;
+        } else {
+          this.employee_info = response.data.employee;
         }
       }
     },

@@ -46,7 +46,7 @@
                             <th></th>
                         </thead>
                         <tbody v-for="(tatoo, index) in tatoos" :key="tatoo.id">
-                            <td>{{ tatoo.name }}</td>
+                            <td @click="showModal(tatoo.id)">{{ tatoo.name }}</td>
                             <td>{{ tatoo.price }} </td>                        
                             <td>
                                 <i class="fa fa-cog text-success" @click="$router.push({path: '/tatoos/' + tatoo.id})"></i>
@@ -71,6 +71,35 @@
                 <div class="alert alert-info" v-else>
                     По запросу {{ search.keyword }} не найдено ни одной татуировки
                 </div>
+                <modal name="tatoo_info">
+                    <div class="modal-header">
+                        <h2>
+                            {{ tatoo_info.name}}
+                        </h2>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-3">
+                                <img :src="tatoo_info.url" alt="">
+                            </div>
+                            <div class="col-9">
+                                <div class="col-12">
+                                    <h3>Цена:</h3>
+                                    <p>{{ tatoo_info.price }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <h3>Описание</h3>
+                                    {{ tatoo_info.description}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" v-if="tatoo_info.masters.length">
+                            <div class="col-12" v-for="master in masters">
+                                {{ master.name }}
+                            </div>
+                        </div>
+                    </div>
+                </modal>
             </div>
         </div>
     </div>
@@ -101,6 +130,10 @@
           name: '',
           type: ''
         },
+
+        tatoo_info: {
+          masters: []
+        }
       }
     },
 
@@ -154,6 +187,11 @@
         this.switchPage(1);
       },
 
+      showModal(id) {
+        this.loadInfo(id);
+        this.$modal.show('tatoo_info');
+      },
+
       async remove(index, id) {
         const response = await axios.post('/tatoos/remove/' + id);
         if (response.status !== 200 || response.data.status === 'error') {
@@ -189,6 +227,16 @@
         } else {
           this.tatoos = response.data.tatoos.data;
           this.pagination.last_page = response.data.tatoos.last_page;
+        }
+      },
+
+      async loadInfo(id) {
+        const response = await axios.get('/tatoos/info/' + id);
+        if (response.status !== 200 || !response.data.status === 'error') {
+          this.$swal('Ошибка!', response.data.msg, 'error');
+          return false;
+        } else {
+          this.tatoo_info = response.data.tatoo;
         }
       }
     },

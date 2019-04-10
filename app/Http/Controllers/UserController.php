@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Admin\User\UserCollection;
-use App\User;
-use Carbon\Carbon;
+use App\Http\Requests\Admin\User\UserFormRequest;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public $user;
+
+    public function __construct(UserService $user)
+    {
+        $this->user = $user;
+    }
 
 
     /**
@@ -17,32 +21,9 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create(UserFormRequest $request)
     {
-        try {
-            $user = User::where('email', $request->email)->first();
-            if ($user) {
-                throw new \Exception('Такой пользователь есть в системе');
-            }
-            $user = new User();
-            $user->fill([
-                'last_name' => $request->last_name,
-                'first_name' => $request->first_name,
-                'password' => Hash::make($request->password),
-                'email' => $request->email,
-                'birthday' => $this->convertDate($request->birthday)
-            ]);
-            $user->save();
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Пользователь успешно добавлен в систему!'
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->user->create($request);
     }
 
     /**
@@ -53,17 +34,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $users = ($request->page) ? User::paginate(15) : User::all();
-            return response()->json([
-                'users' => new UserCollection($users)
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->user->store($request);
     }
 
     /***
@@ -74,28 +45,7 @@ class UserController extends Controller
      */
     public function search(Request $request)
     {
-        try {
-            $users = new User();
-            if (isset($request->keyword)) {
-                $users = $users->where('name', 'LIKE', $request->keyword.'%');
-            }
-            if (isset($request->filter)) {
-                $filter = json_decode($request->filter);
-
-                if (!empty($filter->name) && !empty($filter->type)) {
-                    $users = $users->orderBy($filter->name, $filter->type);
-                }
-            }
-            $users = $users->paginate(10);
-            return response()->json([
-                'users' => new UserCollection($users)
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->user->search($request);
     }
 
     /**
@@ -104,19 +54,9 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function info($id)
+    public function info(int $id)
     {
-        try {
-            $user = User::findOrFail($id);
-            return response()->json([
-                'user' => $user
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->user->info($id);
     }
 
     /**
@@ -125,19 +65,9 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(int $id)
     {
-        try {
-            $user = User::findOrFail($id);
-            return response()->json([
-                'user' => $user
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->user->edit($id);
     }
 
     /**
@@ -149,26 +79,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try {
-            $user = User::findOrFail($id);
-            $user->fill([
-                'last_name' => $request->last_name,
-                'first_name' => $request->first_name,
-                'password' => Hash::make($request->password),
-                'email' => $request->email,
-                'birthday' => $this->convertDate($request->birthday)
-            ]);
-            $user->save();
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Пользователь успешно обновлён!'
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->user->update($request, $id);
     }
 
     /**
@@ -177,25 +88,8 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        try {
-            $user = User::findOrFail($id);
-            $user->delete();
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Пользователь успешно удалён!'
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
-    }
-
-    public function convertDate($date)
-    {
-        return Carbon::parse($date)->format('Y-m-d');
+        return $this->user->destroy($id);
     }
 }

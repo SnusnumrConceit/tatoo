@@ -14,6 +14,17 @@ class EmployeeInfo extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'name' => $this->name,
+            'description'   =>  $this->description,
+            'appointment'   =>  $this->appointment->name,
+            'url'           =>  $this->setPath($this->url),
+            'tatoos'        =>  $this->tatoos
+        ];
+    }
+
+    public function setPath($url)
+    {
+        return str_replace('public', 'storage', $url);
     }
 }

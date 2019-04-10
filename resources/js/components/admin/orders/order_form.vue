@@ -3,7 +3,7 @@
         <div class="col-12">
             <div class="form-group col-4">
                 <label for="">Клиент</label>
-                <select class="form-control" v-model="order.client">
+                <select class="form-control" v-model="order.user_id">
                     <option :value="client.id"
                             v-for="client in clients"
                             :key="client.id">
@@ -13,21 +13,29 @@
             </div>
             <div class="form-group col-4">
                 <label for="">Таутировка</label>
-                <select class="form-control" v-model="order.tatoo">
+                <select class="form-control" v-model.number="order.tatoo_id">
                     <option :value="tatoo.id"
-                            v-for="tatoo in clients"
+                            v-for="tatoo in tatoos"
                             :key="tatoo.id">
                         {{ tatoo.name }}
                     </option>
                 </select>
             </div>
             <div class="form-group col-4">
-                <label for="">Дата рождения</label>
+                <label for="">Дата и время записи</label>
                 <datepicker v-model="order.note_date"
                             :monday-first="true"
                             :bootstrap-styling="true"
                             :language="ru">
                 </datepicker>
+            </div>
+            <div class="form-group col-4">
+                <label for="">Статус</label>
+                <select name="" id="" class="form-control" v-model="order.status">
+                    <option value="1">Отказано</option>
+                    <option value="2">Предзаказ</option>
+                    <option value="3">Завершён</option>
+                </select>
             </div>
             <div class="form-group col-4">
                 <button class="btn btn-outline-success" v-if="$route.params.id" @click="save">
@@ -54,10 +62,10 @@
     data() {
       return {
         order: {
-          name: '',
-          client: '',
-          tatoo: '',
-          note_date: Date.now()
+          user_id: '',
+          tatoo_id: '',
+          note_date: Date.now(),
+          status: ''
         },
 
         clients: [],
@@ -116,6 +124,7 @@
       if (this.$route.params.id) {
         this.loadData();
       }
+      this.loadExtendsData();
     }
   }
 </script>

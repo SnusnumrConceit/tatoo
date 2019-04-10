@@ -2,46 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Admin\Tatoo\TatooCollection;
-use App\Models\Tatoo;
-use Carbon\Carbon;
+use App\Http\Requests\Admin\Tatoo\TatooFormRequest;
+use App\Services\TatooService;
 use Illuminate\Http\Request;
 
 class TatooController extends Controller
 {
+    public $tatoo;
+
+    public function __construct(TatooService $tatoo)
+    {
+        $this->tatoo = $tatoo;
+    }
+
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create(TatooFormRequest $request)
     {
-        try {
-            $tatoo = Tatoo::where([
-                'name' => $request->name,
-                'description' => $request->description,
-            ])->first();
-            if ($tatoo) {
-                throw new \Exception('Такой работник есть в системе');
-            }
-            $tatoo = new Tatoo();
-            $tatoo->fill([
-                'name' => $request->name,
-                'description' => $request->description,
-                'price' => $request->price,
-                'url' => $request->url
-            ]);
-            $tatoo->save();
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Тату успешно добавлен в систему!'
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->tatoo->create($request);
     }
 
     /**
@@ -52,19 +33,7 @@ class TatooController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $tatoos = ($request->page)
-                ? Tatoo::paginate(15)
-                : Tatoo::all();
-            return response()->json([
-                'tatoos' => new TatooCollection($tatoos)
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->tatoo->store($request);
     }
 
     /***
@@ -75,28 +44,7 @@ class TatooController extends Controller
      */
     public function search(Request $request)
     {
-        try {
-            $tatoos = new Tatoo();
-            if (isset($request->keyword)) {
-                $tatoos = $tatoos->where('name', 'LIKE', $request->keyword.'%');
-            }
-            if (isset($request->filter)) {
-                $filter = json_decode($request->filter);
-
-                if (!empty($filter->name) && !empty($filter->type)) {
-                    $tatoos = $tatoos->orderBy($filter->name, $filter->type);
-                }
-            }
-            $tatoos = $tatoos->paginate(10);
-            return response()->json([
-                'tatoos' => new TatooCollection($tatoos)
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->tatoo->search($request);
     }
 
     /**
@@ -105,19 +53,9 @@ class TatooController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function info($id)
+    public function info(int $id)
     {
-        try {
-            $tatoo = Tatoo::findOrFail($id);
-            return response()->json([
-                'tatoo' => $tatoo
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->tatoo->info($id);
     }
 
     /**
@@ -126,19 +64,9 @@ class TatooController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(int $id)
     {
-        try {
-            $tatoo = Tatoo::findOrFail($id);
-            return response()->json([
-                'tatoo' => $tatoo
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->tatoo->edit($id);
     }
 
     /**
@@ -148,34 +76,9 @@ class TatooController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(TatooFormRequest $request, int $id)
     {
-        try {
-            $tatoo = Tatoo::where([
-                'name' => $request->name,
-                'description' => $request->description,
-            ])->first();
-            if ($tatoo) {
-                throw new \Exception('Такой работник есть в системе');
-            }
-            $tatoo = new Tatoo();
-            $tatoo->fill([
-                'name' => $request->name,
-                'description' => $request->description,
-                'price' => $request->price,
-                'url' => $request->url
-            ]);
-            $tatoo->save();
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Тату успешно обновлён!'
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->tatoo->update($request, $id);
     }
 
     /**
@@ -186,23 +89,6 @@ class TatooController extends Controller
      */
     public function destroy($id)
     {
-        try {
-            $tatoo = Tatoo::findOrFail($id);
-            $tatoo->delete();
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Тату успешно удалён!'
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
-    }
-
-    public function convertDate($date)
-    {
-        return Carbon::parse($date)->format('Y-m-d');
+        return $this->tatoo->destroy($id);
     }
 }

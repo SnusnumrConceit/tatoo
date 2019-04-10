@@ -2,49 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Admin\Employee\EmployeeFormRequest;
 use App\Http\Resources\Admin\Employee\EmployeeCollection;
 use App\Models\Appointment;
 use App\Models\Employee;
+use App\Services\EmployeeService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
+    public $employee;
+
+    public function __construct(EmployeeService $employee)
+    {
+        $this->employee = $employee;
+    }
+
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create(EmployeeFormRequest $request)
     {
-        try {
-            $employee = Employee::where([
-                'name' => $request->name,
-                'description' => $request->description,
-                'appointment_id' => $request->appointment,
-            ])->first();
-            if ($employee) {
-                throw new \Exception('Такой работник есть в системе');
-            }
-            $employee = new Employee();
-            $employee->fill([
-                'name' => $request->name,
-                'description' => $request->description,
-                'appointment_id' => $request->appointment,
-                'birthday' => $this->convertDate($request->birthday),
-                'url' => $request->url
-            ]);
-            $employee->save();
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Работник успешно добавлен в систему!'
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->employee->create($request);
     }
 
     /**
@@ -55,34 +37,12 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $employees = (isset($request->page))
-                ? Employee::with('appointment')->paginate(15)
-                : Employee::with('appointment')->all();
-            return response()->json([
-                'employees' => new EmployeeCollection($employees)
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->employee->store($request);
     }
 
     public function extends()
     {
-        try {
-            $appointments = Appointment::all();
-            return response()->json([
-                'appointments' => $appointments
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->employee->extends();
     }
 
     /***
@@ -93,28 +53,7 @@ class EmployeeController extends Controller
      */
     public function search(Request $request)
     {
-        try {
-            $employees = new Employee();
-            if (isset($request->keyword)) {
-                $employees = $employees->where('name', 'LIKE', $request->keyword.'%');
-            }
-            if (isset($request->filter)) {
-                $filter = json_decode($request->filter);
-
-                if (!empty($filter->name) && !empty($filter->type)) {
-                    $employees = $employees->orderBy($filter->name, $filter->type);
-                }
-            }
-            $employees = $employees->with('appointment')->paginate(10);
-            return response()->json([
-                'employees' => new EmployeeCollection($employees)
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->employee->search($request);
     }
 
     /**
@@ -125,17 +64,7 @@ class EmployeeController extends Controller
      */
     public function info($id)
     {
-        try {
-            $employee = Employee::findOrFail($id);
-            return response()->json([
-                'employee' => $employee
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->employee->info($id);
     }
 
     /**
@@ -144,19 +73,9 @@ class EmployeeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(int $id)
     {
-        try {
-            $employee = Employee::findOrFail($id);
-            return response()->json([
-                'employee' => $employee
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->employee->edit($id);
     }
 
     /**
@@ -166,36 +85,9 @@ class EmployeeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EmployeeFormRequest $request, int $id)
     {
-        try {
-            $employee = Employee::where([
-                'name' => $request->name,
-                'description' => $request->description,
-                'appointment_id' => $request->appointment,
-            ])->first();
-            if ($employee) {
-                throw new \Exception('Такой работник есть в системе');
-            }
-            $employee = new Employee();
-            $employee->fill([
-                'name' => $request->name,
-                'description' => $request->description,
-                'appointment_id' => $request->appointment,
-                'birthday' => $this->convertDate($request->birthday),
-                'url' => $request->url
-            ]);
-            $employee->save();
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Работник успешно обновлён!'
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->employee->update($request, $id);
     }
 
     /**
@@ -204,25 +96,8 @@ class EmployeeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        try {
-            $employee = Employee::findOrFail($id);
-            $employee->delete();
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Работник успешно удалён!'
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
-    }
-
-    public function convertDate($date)
-    {
-        return Carbon::parse($date)->format('Y-m-d');
+        return $this->employee->destroy($id);
     }
 }

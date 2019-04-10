@@ -11,4 +11,14 @@ class Tatoo extends Model
     ];
 
     public $timestamps = false;
+
+    public function masters()
+    {
+        return $this->belongsToMany(
+            Employee::class,
+            'master_tatoos',
+            'tatoo_id',
+            'employee_id'
+        );
+    }
 }

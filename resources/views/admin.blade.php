@@ -69,6 +69,7 @@
 </head>
 <body>
 <div id="app">
+    {{ csrf_token() }}
     <admin></admin>
 </div>
 </body>

@@ -2,42 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Admin\Appointment\AppointmentFormRequest;
 use App\Models\Appointment;
+use App\Services\AppointmentService;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
+    public $appointment;
+
+    public function __construct(AppointmentService $appointment)
+    {
+        $this->appointment = $appointment;
+    }
 
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create(AppointmentFormRequest $request)
     {
-        try {
-            $appointment = new Appointment();
-            if (! empty($request->name)) {
-                $dublicate = Appointment::where('name', $request->name)->count();
-                if ($dublicate) {
-                    throw new \Exception('Данная должность внесена в систему');
-                }
-            } else {
-                throw new \Exception('Вы не указали наименование должности');
-            }
-            $appointment->fill([
-                'name' => $request->name
-            ]);
-            $appointment->save();
-            return response()->json([
-                'status' => 'success'
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->appointment->create($request);
     }
 
     /**
@@ -48,40 +34,12 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $appointments = Appointment::paginate(25);
-            return response()->json([
-                'appointments' => $appointments
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->appointment->store($request);
     }
 
     public function search(Request $request)
     {
-        try {
-            $query = new Appointment();
-            if (! empty($request->keyword)) {
-                $query = $query->where('name', 'LIKE', '%'.$request->keyword.'%');
-            }
-            if (! empty($request->filter)) {
-                $filter = json_decode($request->filter);
-                $query = $query->orderBy($filter->name, $filter->type);
-            }
-            $appointments = $query->paginate(25);
-            return response()->json([
-                'appointments' => $appointments
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->appointment->search($request);
     }
 
 
@@ -91,19 +49,9 @@ class AppointmentController extends Controller
      * @param  \App\Models\Appointment  $appointment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Appointment $appointment, int $id)
+    public function edit(int $id)
     {
-        try {
-            $appointment = Appointment::findOrFail($id);
-            return response()->json([
-                'appointment' => $appointment
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->appointment->destroy($id);
     }
 
     /**
@@ -113,31 +61,9 @@ class AppointmentController extends Controller
      * @param  \App\Models\Appointment  $appointment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, int $id)
+    public function update(AppointmentFormRequest $request, int $id)
     {
-        try {
-            if (! empty($request->name)) {
-                $dublicate = Appointment::where('name', $request->name)->count();
-                if ($dublicate == 1) {
-                    throw new \Exception('Данная должность внесена в систему');
-                }
-            } else {
-                throw new \Exception('Вы не указали наименование должности');
-            }
-            $appointment = Appointment::findOrFail($id);
-            $appointment->fill([
-                'name' => $request->name
-            ]);
-            $appointment->save();
-            return response()->json([
-                'status' => 'success'
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->appointment->update($request, $id);
     }
 
     /**
@@ -148,16 +74,6 @@ class AppointmentController extends Controller
      */
     public function destroy(int $id)
     {
-        try {
-            $appointment = Appointment::findOrFail($id)->delete();
-            return response()->json([
-                'status' => 'success',
-            ], 200);
-        } catch (\Exception $error) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $error->getMessage()
-            ]);
-        }
+        return $this->appointment->destroy($id);
     }
 }
