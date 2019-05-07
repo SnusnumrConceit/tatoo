@@ -28,6 +28,7 @@
                             :bootstrap-styling="true"
                             :language="ru">
                 </datepicker>
+                <vue-timepicker v-model="order.note_time" format="HH:mm"></vue-timepicker>
             </div>
             <div class="form-group col-4">
                 <label for="">Статус</label>
@@ -54,17 +55,22 @@
 
 <script>
   import Datepicker from 'vuejs-datepicker';
+  import VueTimepicker from 'vue2-timepicker'
   import {ru,en} from 'vuejs-datepicker/dist/locale';
 
   export default {
     name: "order_form",
-    components: {Datepicker},
+    components: {Datepicker, VueTimepicker},
     data() {
       return {
         order: {
           user_id: '',
           tatoo_id: '',
           note_date: Date.now(),
+          note_time: {
+            HH: '00',
+            mm: '00'
+          },
           status: ''
         },
 
@@ -72,7 +78,12 @@
         tatoos: [],
 
         ru: ru,
-        en: en
+        en: en,
+
+        swal: {
+          errors: [],
+          message: ``
+        },
       }
     },
     methods: {
@@ -80,7 +91,13 @@
         if (this.$route.params.id) {
           const response = await axios.post('/orders/update/' + this.$route.params.id, this.order);
           if (response.status !== 200 || response.data.status === 'error') {
-            this.$swal('Ошибка!', response.data.msg, 'error');
+            this.swal.errors = (response.data.errors !== undefined) ? response.data.errors : {};
+            this.swal.message = this.getSwalMessage();
+            this.$swal({
+              title: 'Ошибка!',
+              html: response.data.msg + this.swal.message,
+              type: 'error'
+            });
             return false;
           }
           this.$swal('Успешно!', response.data.msg, 'success');
@@ -89,7 +106,13 @@
         } else {
           const response = await axios.post('/orders/create', this.order);
           if (response.status !== 200 || response.data.status === 'error') {
-            this.$swal('Ошибка!', response.data.msg, 'error');
+            this.swal.errors = (response.data.errors !== undefined) ? response.data.errors : {};
+            this.swal.message = this.getSwalMessage();
+            this.$swal({
+              title: 'Ошибка!',
+              html: response.data.msg + this.swal.message,
+              type: 'error'
+            });
             return false;
           }
           this.$swal('Успешно!', response.data.msg, 'success');
@@ -117,8 +140,17 @@
         this.clients = response.data.clients;
         this.tatoos = response.data.tatoos;
         return true;
-      }
+      },
 
+      getSwalMessage() {
+        return (Object.keys(this.swal.errors).length) ?
+            `<div class="alert alert-danger m-t-20">
+                        <ul class="p-l-20 p-r-20">
+                            ${Object.values(this.swal.errors).map(err => `<li class="text-danger">${err[0]}</li>`)}
+                        </ul>
+                </div>`
+            : '';
+      }
     },
     created() {
       if (this.$route.params.id) {

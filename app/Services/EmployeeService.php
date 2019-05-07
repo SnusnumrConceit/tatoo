@@ -112,7 +112,11 @@ class EmployeeService
                 $filter = json_decode($request->filter);
 
                 if (!empty($filter->name) && !empty($filter->type)) {
-                    $employees = $employees->orderBy($filter->name, $filter->type);
+                    if ($filter->name === 'appointment') {
+                        $employees = $employees->sortByAppointment($filter->type);
+                    } else {
+                        $employees = $employees->orderBy($filter->name, $filter->type);
+                    }
                 }
             }
             $employees = $employees->with('appointment')->paginate(10);

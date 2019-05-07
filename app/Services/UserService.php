@@ -24,6 +24,7 @@ class UserService
     public function create($request)
     {
         try {
+            $request->validated();
             $user = User::where('email', $request->email)->first();
             if ($user) {
                 throw new \Exception('Такой пользователь есть в системе');
@@ -154,6 +155,7 @@ class UserService
     public function update($request, $id)
     {
         try {
+            $request->validated();
             $user = User::findOrFail($id);
             $user->fill([
                 'last_name'  => $request->last_name,

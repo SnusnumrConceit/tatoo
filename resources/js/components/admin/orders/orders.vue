@@ -6,7 +6,7 @@
                     <div class="col-md-4">
                         <h2 class="title-1 m-b-25">Заказы</h2>
                     </div>
-                    <div class="col-1">
+                    <div class="col-md-2">
                         <button class="btn btn-outline-success" @click="$router.push({ path: '/orders/create' })">
                             Добавить
                         </button>
@@ -289,9 +289,4 @@
         right: 10px;
         bottom: 10px;
     }
-</style>
-</script>
-
-<style scoped>
-
 </style>

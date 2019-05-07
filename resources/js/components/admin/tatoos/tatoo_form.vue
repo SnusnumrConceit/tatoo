@@ -81,7 +81,11 @@
           show: false,
           destination: '',
           tmp: ''
-        }
+        },
+        swal: {
+          errors: [],
+          message: ``
+        },
       }
     },
     methods: {
@@ -122,7 +126,13 @@
         if (this.$route.params.id) {
           const response = await axios.post('/tatoos/update/' + this.$route.params.id, { ...this.tatoo, destination: this.crop.destination});
           if (response.status !== 200 || response.data.status === 'error') {
-            this.$swal('Ошибка!', response.data.msg, 'error');
+            this.swal.errors = (response.data.errors !== undefined) ? response.data.errors : {};
+            this.swal.message = this.getSwalMessage();
+            this.$swal({
+              title: 'Ошибка!',
+              html: response.data.msg + this.swal.message,
+              type: 'error'
+            });
             return false;
           }
           this.$swal('Успешно!', response.data.msg, 'success');
@@ -131,7 +141,13 @@
         } else {
           const response = await axios.post('/tatoos/create', { ...this.tatoo, destination: this.crop.destination});
           if (response.status !== 200 || response.data.status === 'error') {
-            this.$swal('Ошибка!', response.data.msg, 'error');
+            this.swal.errors = (response.data.errors !== undefined) ? response.data.errors : {};
+            this.swal.message = this.getSwalMessage();
+            this.$swal({
+              title: 'Ошибка!',
+              html: response.data.msg + this.swal.message,
+              type: 'error'
+            });
             return false;
           }
           this.$swal('Успешно!', response.data.msg, 'success');
@@ -149,6 +165,16 @@
         this.tatoo = response.data.tatoo;
         this.crop.tmp = this.tatoo.url.replace('public', 'storage');
         return true;
+      },
+
+      getSwalMessage() {
+        return (Object.keys(this.swal.errors).length) ?
+            `<div class="alert alert-danger m-t-20">
+                        <ul class="p-l-20 p-r-20">
+                            ${Object.values(this.swal.errors).map(err => `<li class="text-danger">${err[0]}</li>`)}
+                        </ul>
+                </div>`
+            : '';
       }
     },
     created() {

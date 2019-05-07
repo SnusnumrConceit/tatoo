@@ -5,6 +5,7 @@ namespace App\Http\Requests\Admin\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
 class UserFormRequest extends FormRequest
 {
@@ -30,18 +31,18 @@ class UserFormRequest extends FormRequest
             'email'         =>  'required|email|min:10|max:60',
             'password'      =>  'required|min:8|max:50',
             'first_name'    =>  'required|min:3|max:20',
-            'last_name'    =>  'required|min:2|max:30',
+            'last_name'    =>   'required|min:2|max:30',
             'birthday'      =>  'required|date',
         ];
     }
 
     public function failedValidation(Validator $validator)
     {
-        return response()->json([
+        throw new ValidationException($validator, response()->json([
             'status'    =>  'error',
             'errors'    =>  $validator->errors(),
             'msg'       =>  'Проверьте корректность данных'
-        ]);
+        ]));
     }
 
     public function failedAuthorization()

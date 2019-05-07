@@ -13,6 +13,7 @@ use App\Http\Resources\Admin\Order\OrderCollection;
 use App\Http\Resources\Admin\Order\OrderCustomerExtendsCollection;
 use App\Http\Resources\Admin\Order\OrderInfo;
 use App\Http\Resources\Admin\Order\OrderTatooExtendsCollection;
+use App\Http\Resources\Order\OrderForm;
 use App\Model\Order;
 use App\Models\Tatoo;
 use App\User;
@@ -34,7 +35,7 @@ class OrderService
                 'tatoo_id'  =>  $request->tatoo_id,
                 'user_id'   =>  $request->user_id,
                 'status'    =>  $request->status,
-                'note_date' =>  $this->convertDate($request->note_date)
+                'note_date' =>  $this->convertDate($request->note_date, $request->note_time)
             ]);
             $order->save();
             return response()->json([
@@ -75,13 +76,17 @@ class OrderService
         try {
             $query = new Order();
             if (isset($request->keyword)) {
-                $query = $query->where('name', 'LIKE', $request->keyword.'%');
+                $query = $query->searchByTatoo($request->keyword);
             }
             if (isset($request->filter)) {
                 $filter = json_decode($request->filter);
 
                 if (!empty($filter->name) && !empty($filter->type)) {
-                    $query = $query->orderBy($filter->name, $filter->type);
+                    switch ($filter->name) {
+                        case 'tatoo': $query = $query->sortByTatoo($filter->type); break;
+                        case 'name': $query = $query->sortByCustomer($filter->type); break;
+                        default: $query = $query->orderBy($filter->name, $filter->type); break;
+                    }
                 }
             }
             $orders = $query->with(['customer', 'tatoo'])->paginate(25);
@@ -145,7 +150,8 @@ class OrderService
         try {
             $order = Order::with(['tatoo', 'customer'])->findOrFail($id);
             return response()->json([
-                'order' => $order
+//                'order' => $order
+                'order' => new OrderForm($order)
             ], 200);
         } catch (\Exception $error) {
             return response()->json([
@@ -171,7 +177,7 @@ class OrderService
                 'tatoo_id'  =>  $request->tatoo_id,
                 'user_id'   =>  $request->user_id,
                 'status'    =>  $request->status,
-                'note_date' =>  $this->convertDate($request->note_date)
+                'note_date' =>  $this->convertDate($request->note_date, $request->note_time)
             ]);
             $order->save();
             return response()->json([
@@ -197,7 +203,8 @@ class OrderService
         try {
             Order::findOrFail($id)->delete();
             return response()->json([
-                'status' => 'success'
+                'status' => 'success',
+                'msg' => 'Заказ успешно удалён'
             ], 200);
         } catch (\Exception $error) {
             return response()->json([
@@ -207,8 +214,8 @@ class OrderService
         }
     }
 
-    public function convertDate($date)
+    public function convertDate($date, $time)
     {
-        return Carbon::parse($date)->format('Y-m-d H:i:s');
+        return Carbon::parse($date)->format('Y-m-d') . ' '. $time['HH'].':'.$time['mm'];
     }
 }

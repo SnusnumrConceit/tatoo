@@ -31,12 +31,12 @@ class CreateOrdersTable extends Migration
            $table->foreign('user_id')
                ->references('id')
                ->on('users')
-               ->onDelete('set null');
+               ->onDelete('cascade');
 
             $table->foreign('tatoo_id')
                 ->references('id')
                 ->on('tatoos')
-                ->onDelete('set null');
+                ->onDelete('cascade');
         });
     }
 

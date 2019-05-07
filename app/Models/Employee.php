@@ -21,4 +21,11 @@ class Employee extends Model
             'employee_id',
             'tatoo_id');
     }
+
+    public function sortByAppointment($type)
+    {
+        return $this->join('appointments', 'employees.appointment_id', '=', 'appointments.id')
+            ->orderBy('appointments.name', $type)
+            ->select('employees.*');
+    }
 }

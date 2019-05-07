@@ -97,7 +97,12 @@
         },
 
         ru: ru,
-        en: en
+        en: en,
+
+        swal: {
+          errors: [],
+          message: ``
+        },
       }
     },
     methods: {
@@ -137,7 +142,13 @@
         if (this.$route.params.id) {
           const response = await axios.post('/employees/update/' + this.$route.params.id, { ...this.employee, destination: this.crop.destination});
           if (response.status !== 200 || response.data.status === 'error') {
-            this.$swal('Ошибка!', response.data.msg, 'error');
+            this.swal.errors = (response.data.errors !== undefined) ? response.data.errors : {};
+            this.swal.message = this.getSwalMessage();
+            this.$swal({
+              title: 'Ошибка!',
+              html: response.data.msg + this.swal.message,
+              type: 'error'
+            });
             return false;
           }
           this.$swal('Успешно!', response.data.msg, 'success');
@@ -146,7 +157,13 @@
         } else {
           const response = await axios.post('/employees/create', { ...this.employee, destination: this.crop.destination});
           if (response.status !== 200 || response.data.status === 'error') {
-            this.$swal('Ошибка!', response.data.msg, 'error');
+            this.swal.errors = (response.data.errors !== undefined) ? response.data.errors : {};
+            this.swal.message = this.getSwalMessage();
+            this.$swal({
+              title: 'Ошибка!',
+              html: response.data.msg + this.swal.message,
+              type: 'error'
+            });
             return false;
           }
           this.$swal('Успешно!', response.data.msg, 'success');
@@ -174,6 +191,16 @@
         }
         this.appointments = response.data.appointments;
         return true;
+      },
+
+      getSwalMessage() {
+        return (Object.keys(this.swal.errors).length) ?
+            `<div class="alert alert-danger m-t-20">
+                        <ul class="p-l-20 p-r-20">
+                            ${Object.values(this.swal.errors).map(err => `<li class="text-danger">${err[0]}</li>`)}
+                        </ul>
+                </div>`
+            : '';
       }
 
     },
