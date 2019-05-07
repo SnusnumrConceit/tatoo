@@ -190,7 +190,8 @@ return [
         'size'                  => 'Размер',
         'birthday'              => 'Дата рождения',
 
-        'appointment_id'        =>  'Дожность',
+        'appointment_id'        =>  'Должность',
+        'appointment'           =>  'Должность',
         'tatoo_id'              =>  'Татуировка',
         'user_id'               =>  'Клиент',
         'note_date'             =>  'Дата и время записи',

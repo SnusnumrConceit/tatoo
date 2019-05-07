@@ -22,8 +22,8 @@ class AppointmentService
     {
         try {
             $appointment = new Appointment();
-            if (! empty($request->name)) {
-                $dublicate = Appointment::where('name', $request->name)->count();
+            if (! empty($request->appointment)) {
+                $dublicate = Appointment::where('name', $request->appointment)->count();
                 if ($dublicate) {
                     throw new \Exception('Данная должность внесена в систему');
                 }
@@ -31,7 +31,7 @@ class AppointmentService
                 throw new \Exception('Вы не указали наименование должности');
             }
             $appointment->fill([
-                'name' => $request->name
+                'name' => $request->appointment
             ]);
             $appointment->save();
             return response()->json([
@@ -97,7 +97,7 @@ class AppointmentService
      * @param  \App\Models\Appointment  $appointment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Appointment $appointment, int $id)
+    public function edit(int $id)
     {
         try {
             $appointment = Appointment::findOrFail($id);
@@ -122,8 +122,8 @@ class AppointmentService
     public function update($request, int $id)
     {
         try {
-            if (! empty($request->name)) {
-                $dublicate = Appointment::where('name', $request->name)->count();
+            if (! empty($request->appointment)) {
+                $dublicate = Appointment::where('name', $request->appointment)->count();
                 if ($dublicate == 1) {
                     throw new \Exception('Данная должность внесена в систему');
                 }
@@ -132,7 +132,7 @@ class AppointmentService
             }
             $appointment = Appointment::findOrFail($id);
             $appointment->fill([
-                'name' => $request->name
+                'name' => $request->appointment
             ]);
             $appointment->save();
             return response()->json([
@@ -159,6 +159,7 @@ class AppointmentService
             $appointment = Appointment::findOrFail($id)->delete();
             return response()->json([
                 'status' => 'success',
+                'msg'    => 'Должность успешно удалена'
             ], 200);
         } catch (\Exception $error) {
             return response()->json([

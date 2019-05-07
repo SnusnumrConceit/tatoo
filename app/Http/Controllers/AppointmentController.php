@@ -51,7 +51,7 @@ class AppointmentController extends Controller
      */
     public function edit(int $id)
     {
-        return $this->appointment->destroy($id);
+        return $this->appointment->edit($id);
     }
 
     /**

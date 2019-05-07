@@ -9,6 +9,7 @@
 namespace App\Services;
 
 
+use App\Events\OrderCompleted;
 use App\Http\Resources\Admin\Order\OrderCollection;
 use App\Http\Resources\Admin\Order\OrderCustomerExtendsCollection;
 use App\Http\Resources\Admin\Order\OrderInfo;
@@ -38,6 +39,8 @@ class OrderService
                 'note_date' =>  $this->convertDate($request->note_date, $request->note_time)
             ]);
             $order->save();
+            $mail_order = Order::with(['customer', 'tatoo'])->findOrFail($order->id);
+            event(new OrderCompleted($mail_order));
             return response()->json([
                 'status'  =>  'success',
                 'msg'     =>  'Заказ успешно обновлён'

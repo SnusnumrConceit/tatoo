@@ -47,7 +47,7 @@
                         </thead>
                         <tbody v-for="(tatoo, index) in tatoos" :key="tatoo.id">
                             <td @click="showModal(tatoo.id)">{{ tatoo.name }}</td>
-                            <td>{{ tatoo.price }} </td>                        
+                            <td>{{ tatoo.price }} ₽</td>
                             <td>
                                 <i class="fa fa-cog text-success" @click="$router.push({path: '/tatoos/' + tatoo.id})"></i>
                                 <i class="fa fa-trash text-danger" @click="remove(index, tatoo.id)"></i>

@@ -28,7 +28,7 @@ class AppointmentFormRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|min:5|max:30'
+            'appointment' => 'required|min:5|max:30'
         ];
     }
 
