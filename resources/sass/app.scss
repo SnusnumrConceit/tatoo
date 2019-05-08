@@ -16,3 +16,11 @@
 th {
   cursor: pointer;
 }
+
+tbody {
+  tr {
+    td:first-child {
+      cursor: pointer;
+    }
+  }
+}

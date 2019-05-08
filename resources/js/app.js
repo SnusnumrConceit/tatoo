@@ -29,6 +29,11 @@ Vue.use(VueRouter);
 import { routes } from "./routes";
 const router = new VueRouter({ routes });
 
+/** Vue-select **/
+import vSelect from 'vue-select'
+
+Vue.component('v-select', vSelect)
+
 
 /** Vuex Configuration **/
 import Vuex from 'vuex';

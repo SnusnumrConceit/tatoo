@@ -56,6 +56,23 @@
                 </textarea>
             </div>
             <div class="form-group col-4">
+                <div class="master-tatoo row p-b-15" v-for="(tatoo, index) in employee.tatoos">
+                    <div class="col-10">
+                        <v-select v-model="employee.tatoos[index]" label="name" :options="tatoos">
+                            <span slot="no-options">Не найдено ни одной татуировки</span>
+                        </v-select>
+                    </div>
+                    <div class="col">
+                        <i class="fa fa-trash text-danger" @click="employee.tatoos.splice(index, 1)"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-4">
+                <button class="btn btn-outline-primary" @click="employee.tatoos.push({})">
+                    Добавить татуировки <i class="far fa-plus-square"></i>
+                </button>
+            </div>
+            <div class="form-group col-4">
                 <button class="btn btn-outline-success" v-if="$route.params.id" @click="save">
                     Сохранить
                 </button>
@@ -85,7 +102,10 @@
           description: '',
           url: '',
           birthday: Date.now(),
-          appointment_id: ''
+          appointment_id: '',
+          tatoos: [
+            {}
+          ]
         },
 
         appointments: [],
@@ -96,6 +116,10 @@
           tmp: ''
         },
 
+        tatoos: [],
+
+        spinner:false,
+
         ru: ru,
         en: en,
 
@@ -103,6 +127,11 @@
           errors: [],
           message: ``
         },
+      }
+    },
+    computed: {
+      selectOptions() {
+        return this.tatoos.map(t => ({label: t.name, value: t.id}));
       }
     },
     methods: {
@@ -190,6 +219,7 @@
           return false;
         }
         this.appointments = response.data.appointments;
+        this.tatoos = response.data.tatoos;
         return true;
       },
 
@@ -213,6 +243,6 @@
   }
 </script>
 
-<style scoped>
-
+<style lang="scss">
+    @import "../../../../../node_modules/vue-select/src/scss/vue-select.scss";
 </style>

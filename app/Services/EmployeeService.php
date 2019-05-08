@@ -11,8 +11,10 @@ namespace App\Services;
 
 use App\Http\Resources\Admin\Employee\EmployeeCollection;
 use App\Http\Resources\Admin\Employee\EmployeeInfo;
+use App\Model\MasterTatoo;
 use App\Models\Appointment;
 use App\Models\Employee;
+use App\Models\Tatoo;
 use Carbon\Carbon;
 
 class EmployeeService
@@ -45,6 +47,9 @@ class EmployeeService
                 'url'            => $request->destination
             ]);
             $employee->save();
+            if (! empty($request->tatoos)) {
+                $this->addTatoos($employee->id, $request->tatoos);
+            }
             return response()->json([
                 'status' => 'success',
                 'msg' => 'Работник успешно добавлен в систему!'
@@ -84,8 +89,10 @@ class EmployeeService
     {
         try {
             $appointments = Appointment::all();
+            $tatoos = Tatoo::all();
             return response()->json([
-                'appointments' => $appointments
+                'appointments' => $appointments,
+                'tatoos'       => $tatoos
             ], 200);
         } catch (\Exception $error) {
             return response()->json([
@@ -161,7 +168,7 @@ class EmployeeService
     public function edit($id)
     {
         try {
-            $employee = Employee::with('appointment')->findOrFail($id);
+            $employee = Employee::with(['appointment', 'tatoos'])->findOrFail($id);
             return response()->json([
                 'employee' => $employee
             ], 200);
@@ -190,7 +197,7 @@ class EmployeeService
                 $url = $request->url;
             }
             $this->image->move($request->url, $request->destination);
-            $employee = new Employee();
+            $employee = Employee::findOrFail($id);
             $employee->fill([
                 'name' => $request->name,
                 'description' => $request->description,
@@ -199,6 +206,10 @@ class EmployeeService
                 'url' => $url
             ]);
             $employee->save();
+            if (! empty($request->tatoos)) {
+                $this->removeTatoos($employee->id);
+                $this->addTatoos($employee->id, $request->tatoos);
+            }
             return response()->json([
                 'status' => 'success',
                 'msg' => 'Работник успешно обновлён!'
@@ -232,6 +243,27 @@ class EmployeeService
                 'msg' => $error->getMessage()
             ]);
         }
+    }
+
+    public function addTatoos($id, $tatoos)
+    {
+        $ids = [];
+        foreach ($tatoos as $tatoo) {
+            if (!empty($tatoo['id']) && ! in_array($tatoo['id'], $ids)) {
+                array_push($ids, $tatoo['id']);
+                MasterTatoo::create([
+                    'tatoo_id' => $tatoo['id'],
+                    'employee_id' => $id
+                ]);
+            } else {
+                continue;
+            }
+        }
+    }
+
+    public function removeTatoos($id)
+    {
+        MasterTatoo::where('employee_id', $id)->delete();
     }
 
     public function convertDate($date)
