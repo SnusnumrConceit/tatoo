@@ -9,7 +9,9 @@
 namespace App\Services;
 
 
+use App\Exports\AppointmentExport;
 use App\Models\Appointment;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AppointmentService
 {
@@ -167,5 +169,10 @@ class AppointmentService
                 'msg' => $error->getMessage()
             ]);
         }
+    }
+
+    public function export()
+    {
+        return new AppointmentExport();
     }
 }

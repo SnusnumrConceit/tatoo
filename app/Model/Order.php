@@ -2,13 +2,14 @@
 
 namespace App\Model;
 
+use App\Models\Employee;
 use App\Models\Tatoo;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['user_id', 'tatoo_id', 'status', 'note_date'];
+    protected $fillable = ['user_id', 'tatoo_id', 'status', 'note_date', 'master_id'];
 
     public function customer()
     {
@@ -18,6 +19,11 @@ class Order extends Model
     public function tatoo()
     {
         return $this->belongsTo(Tatoo::class, 'tatoo_id', 'id');
+    }
+
+    public function master()
+    {
+        return $this->belongsTo(Employee::class, 'master_id', 'id');
     }
 
     public function sortByTatoo($type)

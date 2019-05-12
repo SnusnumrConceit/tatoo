@@ -29,6 +29,11 @@
                             </button>
                         </div>
                     </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-primary" @click="exportData()">
+                            Export
+                        </button>
+                    </div>
                 </div>
                 <div class="table-responsive table--no-card m-b-40" v-if="employees.length">
                     <table class="table table-borderless table-striped table-earning">
@@ -250,6 +255,22 @@
         } else {
           this.employee_info = response.data.employee;
         }
+      },
+
+      exportData() {
+        axios({
+          url: '/employees/export',
+          method: 'GET',
+          responseType: 'blob'
+        }).then((response) => {
+          let blob = new Blob([response.data]);
+          let link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download = 'employees.xlsx'
+          link.click()
+        }).catch((err) => {
+          console.log(err)
+        });
       }
     },
 

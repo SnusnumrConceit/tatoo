@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\JWTAuth;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Auth;
 
 class LoginController extends Controller
@@ -42,7 +43,7 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function authorize(LoginRequest $request)
+    public function login(LoginRequest $request)
     {
         $credentials = $request->only('email', 'password');
 
@@ -57,6 +58,21 @@ class LoginController extends Controller
                 'csrf_token' => csrf_token()
             ], 200);
         } catch (JWTException $error) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => $error->getMessage()
+            ]);
+        }
+    }
+
+    public function logout()
+    {
+        try {
+            auth()->logout();
+            return response()->json([
+                'status' => 'success'
+            ], 200);
+        } catch (\Exception $error) {
             return response()->json([
                 'status' => 'error',
                 'msg' => $error->getMessage()

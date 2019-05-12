@@ -20,12 +20,18 @@ class Employee extends JsonResource
             'name' => $this->name,
             'birthday' => $this->convertDate($this->birthday),
             'created_at' => $this->convertDate($this->created_at),
-            'appointment' => $this->appointment->name
+            'appointment' => $this->appointment->name,
+            'url' =>  $this->setPath($this->url)
         ];
     }
 
     public function convertDate($date)
     {
         return Carbon::parse($date)->format('d.m.Y');
+    }
+
+    public function setPath($url)
+    {
+        return str_replace('public', 'storage', $url);
     }
 }

@@ -17,8 +17,8 @@ class Order extends JsonResource
     {
         return [
             'id'            =>  $this->id,
-            'status'        =>  $this->status,
-            'status_type'   =>  $this->getStatus($this->status),
+            'status'        =>  $this->getStatus($this->status),
+            'status_type'   =>  $this->status,
             'note_date'     =>  $this->parseDate($this->note_date),
             'tatoo'         =>  $this->tatoo->name,
             'price'         =>  $this->tatoo->price,

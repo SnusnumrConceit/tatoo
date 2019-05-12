@@ -14,6 +14,17 @@ class Tatoo extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id'            =>  $this->id,
+            'name'          =>  $this->name,
+            'description'   =>  $this->description,
+            'price'         =>  $this->price,
+            'url'           =>  $this->setPath($this->url)
+        ];
+    }
+
+    public function setPath($url)
+    {
+        return str_replace('public', 'storage', $url);
     }
 }

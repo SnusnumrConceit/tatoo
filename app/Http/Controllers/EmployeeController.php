@@ -100,4 +100,14 @@ class EmployeeController extends Controller
     {
         return $this->employee->destroy($id);
     }
+
+    public function export()
+    {
+        return $this->employee->export();
+    }
+
+    public function getTatoos(int $id)
+    {
+        return $this->employee->getTatoos($id);
+    }
 }

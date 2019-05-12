@@ -29,6 +29,11 @@
                             </button>
                         </div>
                     </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-primary" @click="exportData">
+                            Export
+                        </button>
+                    </div>
                 </div>
                 <div class="table-responsive table--no-card m-b-40" v-if="orders.length">
                     <table class="table table-borderless table-striped table-earning">
@@ -69,9 +74,9 @@
                             <tr v-for="(order, index) in orders" :key="order.id">
                                 <td @click="showModal(order.id)">{{ order.customer }}</td>
                                 <td>{{ order.tatoo }} </td>
-                                <td>{{ order.price }}</td>
+                                <td>{{ order.price }} ₽</td>
                                 <td>{{ order.note_date }} </td>
-                                <td>{{ order.status_type }}</td>
+                                <td>{{ order.status }}</td>
                                 <td>{{ order.created_at }} </td>
                                 <td>
                                     <i class="fa fa-cog text-success" @click="$router.push({path: '/orders/' + order.id})"></i>
@@ -260,6 +265,22 @@
           this.orders = response.data.orders.data;
           this.pagination.last_page = response.data.orders.last_page;
         }
+      },
+
+      exportData() {
+        axios({
+          url: '/orders/export',
+          method: 'GET',
+          responseType: 'blob'
+        }).then((response) => {
+          let blob = new Blob([response.data]);
+          let link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download = 'orders.xlsx'
+          link.click()
+        }).catch((err) => {
+          console.log(err)
+        });
       }
     },
 

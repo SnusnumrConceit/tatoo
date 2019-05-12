@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Admin\Appointment\AppointmentFormRequest;
-use App\Models\Appointment;
 use App\Services\AppointmentService;
 use Illuminate\Http\Request;
 
@@ -75,5 +74,10 @@ class AppointmentController extends Controller
     public function destroy(int $id)
     {
         return $this->appointment->destroy($id);
+    }
+
+    public function export()
+    {
+        return $this->appointment->export();
     }
 }

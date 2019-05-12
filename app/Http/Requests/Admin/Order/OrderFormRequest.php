@@ -31,7 +31,8 @@ class OrderFormRequest extends FormRequest
             'tatoo_id'  => 'required|integer',
             'user_id'   => 'required|integer',
             'status'    => 'required|integer',
-            'note_date' => 'required'
+            'note_date' => 'required',
+            'master'    => 'required|integer'
         ];
     }
 

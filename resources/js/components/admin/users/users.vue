@@ -29,12 +29,17 @@
                             </button>
                         </div>
                     </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-primary" @click="exportData()">
+                            Export
+                        </button>
+                    </div>
                 </div>
                 <div class="table-responsive table--no-card m-b-40" v-if="users.length">
                     <table class="table table-borderless table-striped table-earning">
                         <thead>
                             <th @click="setFilter('name')" class="text-left">
-                                Name
+                                Имя
                                 <i class="fa fa-sort-amount-up" v-if="filter.name === 'name' && filter.type === 'DESC'"></i>
                                 <i class="fa fa-sort-amount-down" v-else-if="filter.name === 'name' && filter.type === 'ASC'"></i>
                             </th>
@@ -202,6 +207,22 @@
           this.users = response.data.users.data;
           this.pagination.last_page = response.data.users.last_page;
         }
+      },
+
+      exportData() {
+        axios({
+          url: '/users/export',
+          method: 'GET',
+          responseType: 'blob'
+        }).then((response) => {
+          let blob = new Blob([response.data]);
+          let link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download = 'users.xlsx'
+          link.click()
+        }).catch((err) => {
+          console.log(err)
+        });
       }
     },
 

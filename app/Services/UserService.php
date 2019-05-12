@@ -9,10 +9,14 @@
 namespace App\Services;
 
 
+use App\Exports\UserExport;
 use App\Http\Resources\Admin\User\UserCollection;
+use App\Http\Resources\Admin\User\UserInfo;
 use App\Http\Resources\UserCartInfo;
+use App\Model\Order;
 use App\User;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserService
 {
@@ -112,9 +116,11 @@ class UserService
     public function info($id)
     {
         try {
-            $user = User::with('orders')->findOrFail($id);
+            $id = (! empty($id)) ? $id : auth()->id();
+            $user = User::findOrFail($id);
+            $user->orders = Order::with('tatoo')->where('user_id', $id)->paginate(15);
             return response()->json([
-                'user' => new UserCartInfo($user)
+                'user_info' => new UserInfo($user)
             ], 200);
         } catch (\Exception $error) {
             return response()->json([
@@ -198,6 +204,11 @@ class UserService
                 'msg'    => $error->getMessage()
             ]);
         }
+    }
+
+    public function export()
+    {
+        return new UserExport();
     }
 
     public function convertDate($date)

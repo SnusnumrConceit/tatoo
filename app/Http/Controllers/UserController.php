@@ -54,7 +54,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function info(int $id)
+    public function info(int $id = null)
     {
         return $this->user->info($id);
     }
@@ -91,5 +91,10 @@ class UserController extends Controller
     public function destroy(int $id)
     {
         return $this->user->destroy($id);
+    }
+
+    public function export()
+    {
+        return $this->user->export();
     }
 }

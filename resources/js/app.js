@@ -34,6 +34,7 @@ import vSelect from 'vue-select'
 
 Vue.component('v-select', vSelect)
 
+import store from './store/index';
 
 /** Vuex Configuration **/
 import Vuex from 'vuex';
@@ -52,6 +53,7 @@ Vue.use(Vuex);
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 import Admin from './components/templates/admin/admin';
+import General from './components/public/general';
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -61,6 +63,7 @@ import Admin from './components/templates/admin/admin';
 
 const app = new Vue({
   el: '#app',
-  components: {Admin},
+  components: {Admin, General},
+  store,
   router
 });

@@ -10,6 +10,7 @@ namespace App\Services;
 
 
 use App\Events\OrderCompleted;
+use App\Exports\OrderExport;
 use App\Http\Resources\Admin\Order\OrderCollection;
 use App\Http\Resources\Admin\Order\OrderCustomerExtendsCollection;
 use App\Http\Resources\Admin\Order\OrderInfo;
@@ -19,6 +20,7 @@ use App\Model\Order;
 use App\Models\Tatoo;
 use App\User;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderService
 {
@@ -36,7 +38,8 @@ class OrderService
                 'tatoo_id'  =>  $request->tatoo_id,
                 'user_id'   =>  $request->user_id,
                 'status'    =>  $request->status,
-                'note_date' =>  $this->convertDate($request->note_date, $request->note_time)
+                'note_date' =>  $this->convertDate($request->note_date, $request->note_time),
+                'master_id' =>  $request->master
             ]);
             $order->save();
             $mail_order = Order::with(['customer', 'tatoo'])->findOrFail($order->id);
@@ -151,7 +154,7 @@ class OrderService
     public function edit($id)
     {
         try {
-            $order = Order::with(['tatoo', 'customer'])->findOrFail($id);
+            $order = Order::with(['tatoo', 'customer', 'master'])->findOrFail($id);
             return response()->json([
 //                'order' => $order
                 'order' => new OrderForm($order)
@@ -180,7 +183,8 @@ class OrderService
                 'tatoo_id'  =>  $request->tatoo_id,
                 'user_id'   =>  $request->user_id,
                 'status'    =>  $request->status,
-                'note_date' =>  $this->convertDate($request->note_date, $request->note_time)
+                'note_date' =>  $this->convertDate($request->note_date, $request->note_time),
+                'master_id' =>  $request->master
             ]);
             $order->save();
             return response()->json([
@@ -217,8 +221,37 @@ class OrderService
         }
     }
 
+    public function export()
+    {
+        return new OrderExport();
+    }
+
     public function convertDate($date, $time)
     {
         return Carbon::parse($date)->format('Y-m-d') . ' '. $time['HH'].':'.$time['mm'];
+    }
+
+    public function publish($request)
+    {
+        try {
+//            Validator::make([]);
+            $order = (new Order)->fill([
+                'tatoo_id'  => $request->tatoo,
+                'user_id'   => auth()->id(),
+                'master_id' => $request->master['id'],
+                'status'    => 2,
+                'note_date' => $this->convertDate($request->note_date, $request->note_time)
+            ]);
+            $order->save();
+            return response()->json([
+                'status' => 'success',
+                'msg' => 'Запись успешно совершена!'
+            ], 200);
+        } catch (\Exception $error) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => $error->getMessage()
+            ]);
+        }
     }
 }

@@ -13,80 +13,105 @@ import EmployeeForm from './components/admin/employees/employee_form';
 import Orders from './components/admin/orders/orders';
 import OrderForm from './components/admin/orders/order_form';
 
+import Contacts from './components/public/content/contacts';
+import PublicTatoos from './components/public/content/tatoos_public';
+import PublicMasters from './components/public/content/masters_public';
+
 export const routes = [
   {
     name: 'users',
-    path: '/users',
+    path: '/admin/users',
     component: Users
   },
   {
     name: 'user_form',
-    path: '/users/create',
+    path: '/admin/users/create',
     component: UserForm
   },
   {
     name: 'user_form',
-    path: '/users/:id',
+    path: '/admin/users/:id',
     component: UserForm
   },
   {
     name: 'tatoos',
-    path: '/tatoos',
+    path: '/admin/tatoos',
     component: Tatoos
   },
   {
     name: 'tatoo_form',
-    path: '/tatoos/create',
+    path: '/admin/tatoos/create',
     component: TatooForm
   },
   {
     name: 'tatoo_form',
-    path: '/tatoos/:id',
+    path: '/admin/tatoos/:id',
     component: TatooForm
   },
   {
     name: 'employees',
-    path: '/employees',
+    path: '/admin/employees',
     component: Employees
   },
   {
     name: 'employee_form',
-    path: '/employees/create',
+    path: '/admin/employees/create',
     component: EmployeeForm
   },
   {
     name: 'employee_form',
-    path: '/employees/:id',
+    path: '/admin/employees/:id',
     component: EmployeeForm
   },
   {
     name: 'orders',
-    path: '/orders',
+    path: '/admin/orders',
     component: Orders
   },
   {
     name: 'order_form',
-    path: '/orders/create',
+    path: '/admin/orders/create',
     component: OrderForm
   },
   {
     name: 'order_form',
-    path: '/orders/:id',
+    path: '/admin/orders/:id',
     component: OrderForm
   },
   {
     name: 'appointments',
-    path: '/appointments',
+    path: '/admin/appointments',
     component: Appointments
   },
   {
     name: 'appointment_form',
-    path: '/appointments/create',
+    path: '/admin/appointments/create',
     component: AppointmentForm
   },
   {
     name: 'appointment_form',
-    path: '/appointments/:id',
+    path: '/admin/appointments/:id',
     component: AppointmentForm
-  }
+  },
+
+  /***
+   *
+   * Public routes
+   *
+   */
+  {
+    name: 'contacts',
+    path: '/contacts',
+    component: Contacts
+  },
+  {
+    name: 'public_tatoos',
+    path: '/tatoos',
+    component: PublicTatoos
+  },
+  {
+    name: 'public_masters',
+    path: '/masters',
+    component: PublicMasters
+  },
 ];

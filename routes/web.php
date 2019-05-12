@@ -15,6 +15,10 @@ Route::get('/', function () {
     return view('admin');
 });
 
+Route::get('/home', function () {
+    return view('home');
+});
+
 Route::group([
     'prefix' => 'users'
 ], function () {
@@ -22,12 +26,19 @@ Route::group([
     Route::get('/search', 'UserController@search');
     Route::get('/edit/{id}', 'UserController@edit')
         ->where('id', '[0-9]+');
-    Route::get('/info/{id}', 'UserController@info')
+    Route::get('/info/{id?}', 'UserController@info')
         ->where('id', '[0-9]+');
     Route::post('/create', 'UserController@create');
     Route::post('/update/{id}', 'UserController@update')
         ->where('id', '[0-9]+');
     Route::post('/remove/{id}', 'UserController@destroy')
+        ->where('id', '[0-9]+');
+    Route::get('/export', 'UserController@export');
+});
+
+Route::group(['prefix' => 'masters'], function () {
+    Route::get('/', 'EmployeeController@store');
+    Route::get('/{id}/tatoos', 'EmployeeController@getTatoos')
         ->where('id', '[0-9]+');
 });
 
@@ -46,6 +57,7 @@ Route::group([
     Route::post('/remove/{id}', 'EmployeeController@destroy')
         ->where('id', '[0-9]+');
     Route::get('/extends', 'EmployeeController@extends');
+    Route::get('/export', 'EmployeeController@export');
 });
 
 Route::group([
@@ -63,6 +75,8 @@ Route::group([
     Route::post('/remove/{id}', 'OrderController@destroy')
         ->where('id', '[0-9]+');
     Route::get('/extends', 'OrderController@extends');
+    Route::get('/export', 'OrderController@export');
+    Route::post('/publish', 'OrderController@publish');
 });
 
 Route::group([
@@ -78,6 +92,9 @@ Route::group([
     Route::post('/update/{id}', 'TatooController@update')
         ->where('id', '[0-9]+');
     Route::post('/remove/{id}', 'TatooController@destroy')
+        ->where('id', '[0-9]+');
+    Route::get('/export', 'TatooController@export');
+    Route::get('/masters/{id}', 'TatooController@getTatooMasters')
         ->where('id', '[0-9]+');
 });
 
@@ -95,6 +112,7 @@ Route::group([
         ->where('id', '[0-9]+');
     Route::post('/remove/{id}', 'AppointmentController@destroy')
         ->where('id', '[0-9]+');
+    Route::get('/export', 'AppointmentController@export');
 });
 
 Route::group([
@@ -103,6 +121,11 @@ Route::group([
    Route::post('/upload', 'ImageController@upload');
    Route::post('/remove', 'ImageController@remove');
 });
-Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::group(['namespace' => 'Auth'], function () {
+    Route::post('/login', 'LoginController@login');
+    Route::post('/registration', 'RegisterController@registry');
+    Route::post('/logout', 'LoginController@logout');
+});
+
+//Route::get('/home', 'HomeController@index')->name('home');

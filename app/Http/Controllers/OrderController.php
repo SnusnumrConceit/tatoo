@@ -85,4 +85,14 @@ class OrderController extends Controller
     {
         return $this->order->destroy($id);
     }
+
+    public function export()
+    {
+        return $this->order->export();
+    }
+
+    public function publish(Request $request)
+    {
+        return $this->order->publish($request);
+    }
 }

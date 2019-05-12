@@ -9,6 +9,7 @@
 namespace App\Services;
 
 
+use App\Exports\MasterExport;
 use App\Http\Resources\Admin\Employee\EmployeeCollection;
 use App\Http\Resources\Admin\Employee\EmployeeInfo;
 use App\Model\MasterTatoo;
@@ -16,6 +17,7 @@ use App\Models\Appointment;
 use App\Models\Employee;
 use App\Models\Tatoo;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeService
 {
@@ -24,6 +26,16 @@ class EmployeeService
     public function __construct(ImageService $image)
     {
         $this->image = $image;
+    }
+
+    /***
+     * Export masters
+     *
+     * @return MasterExport
+     */
+    public function export()
+    {
+        return new MasterExport();
     }
 
     /**
@@ -71,9 +83,11 @@ class EmployeeService
     public function store($request)
     {
         try {
-            $employees = (isset($request->page))
-                ? Employee::with('appointment')->paginate(15)
-                : Employee::with('appointment')->all();
+//            $employees = (isset($request->page))
+//                ? Employee::with('appointment')->paginate(15)
+//                : Employee::with('appointment')->all();
+
+            $employees = Employee::with('appointment')->paginate(15);
             return response()->json([
                 'employees' => new EmployeeCollection($employees)
             ], 200);
@@ -269,5 +283,20 @@ class EmployeeService
     public function convertDate($date)
     {
         return Carbon::parse($date)->format('Y-m-d');
+    }
+
+    public function getTatoos($id)
+    {
+        try {
+            $master = Employee::with('tatoos')->findOrFail($id);
+            return response()->json([
+                'tatoos' => $master->tatoos
+            ], 200);
+        } catch (\Exception $error) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => $error->getMessage()
+            ]);
+        }
     }
 }

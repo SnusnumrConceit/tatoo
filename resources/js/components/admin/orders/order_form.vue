@@ -13,13 +13,17 @@
             </div>
             <div class="form-group col-4">
                 <label for="">Таутировка</label>
-                <select class="form-control" v-model.number="order.tatoo_id">
+                <select class="form-control" v-model.number="order.tatoo_id" @change="loadMasters">
                     <option :value="tatoo.id"
                             v-for="tatoo in tatoos"
                             :key="tatoo.id">
                         {{ tatoo.name }}
                     </option>
                 </select>
+            </div>
+            <div class="form-group col-4">
+                <label for="">Мастер</label>
+                <v-select :options="masters" label="name" v-model="order.master"></v-select>
             </div>
             <div class="form-group col-4">
                 <label for="">Дата и время записи</label>
@@ -71,7 +75,8 @@
             HH: '00',
             mm: '00'
           },
-          status: ''
+          status: '',
+          master: {}
         },
 
         clients: [],
@@ -84,10 +89,13 @@
           errors: [],
           message: ``
         },
+
+        masters: []
       }
     },
     methods: {
       async save() {
+        this.order.master = this.order.master.id;
         if (this.$route.params.id) {
           const response = await axios.post('/orders/update/' + this.$route.params.id, this.order);
           if (response.status !== 200 || response.data.status === 'error') {
@@ -140,6 +148,15 @@
         this.clients = response.data.clients;
         this.tatoos = response.data.tatoos;
         return true;
+      },
+
+      async loadMasters() {
+        const response = await axios.get(`/tatoos/masters/${this.order.tatoo_id}`);
+        if (response.status !== 200 || response.data.status === 'error') {
+          this.$swal('Ошибка!', response.data.msg, 'error');
+          return false;
+        }
+        this.masters = response.data.masters;
       },
 
       getSwalMessage() {

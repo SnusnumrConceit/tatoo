@@ -8,10 +8,14 @@
 
 namespace App\Services;
 
+use App\Exports\TatooExport;
 use App\Http\Resources\Admin\Tatoo\TatooCollection;
 use App\Http\Resources\Admin\Tatoo\TatooInfo;
+use App\Model\Order;
 use App\Models\Tatoo;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TatooService
 {
@@ -214,8 +218,28 @@ class TatooService
         }
     }
 
+    public function export()
+    {
+        return new TatooExport();
+    }
+
     public function convertDate($date)
     {
         return Carbon::parse($date)->format('Y-m-d');
+    }
+
+    public function getTatooMasters($id)
+    {
+        try {
+            $tatoo = Tatoo::with('masters')->findOrFail($id);
+            return response()->json([
+                'masters' => $tatoo->masters
+            ], 200);
+        } catch (\Exception $error) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => $error->getMessage()
+            ]);
+        }
     }
 }

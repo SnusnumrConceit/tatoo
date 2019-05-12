@@ -29,6 +29,11 @@
                             </button>
                         </div>
                     </div>
+                    <div class="md-2">
+                        <button class="btn btn-outline-primary" @click="exportData">
+                            Export
+                        </button>
+                    </div>
                 </div>
                 <div class="table-responsive table--no-card m-b-40" v-if="appointments.length">
                     <table class="table table-borderless table-striped table-earning">
@@ -183,6 +188,25 @@
           this.appointments = response.data.appointments.data;
           this.pagination.last_page = response.data.appointments.last_page;
         }
+      },
+
+      async exportData() {
+        // const response = await axios.get('/appointments/export');
+        axios({
+          url: '/appointments/export',
+          responseType: 'blob',
+          method: 'GET'
+        })
+        .then((response) => {
+          let blob = new Blob([response.data]);
+          let link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download = 'appointments.xlsx'
+          link.click()
+        })
+        .catch((err) => {
+          console.log(err)
+        });
       }
     },
 

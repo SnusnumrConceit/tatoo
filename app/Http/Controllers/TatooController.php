@@ -91,4 +91,19 @@ class TatooController extends Controller
     {
         return $this->tatoo->destroy($id);
     }
+
+    public function export()
+    {
+        return $this->tatoo->export();
+    }
+
+    public function getTatooMasters($id)
+    {
+        return $this->tatoo->getTatooMasters($id);
+    }
+
+    public function publish(Request $request)
+    {
+        return $this->tatoo->publish($request);
+    }
 }
