@@ -8,31 +8,31 @@
                 <nav class="navbar-sidebar">
                     <ul class="list-unstyled navbar__list">
                         <li :class="{ 'active': menu.isActive.orders, 'has-sub': menu.isActive.orders}" @click="active('orders', 'menu')" v-if="accessAdmin">
-                            <router-link :to="'/orders'">
+                            <router-link :to="'/admin/orders'">
                                 <i class="far fa-money-bill-alt"></i>
                                 Заказы
                             </router-link>
                         </li>
                         <li :class="{ 'active': menu.isActive.tatoos, 'has-sub': menu.isActive.tatoos}" @click="active('tatoos', 'menu')" v-if="accessAdmin">
-                            <router-link :to="'/tatoos'">
+                            <router-link :to="'/admin/tatoos'">
                                 <i class="fab fa-gitkraken"></i>
                                 Татуировки
                             </router-link>
                         </li>
                         <li :class="{ 'active': menu.isActive.employees, 'has-sub': menu.isActive.employees}" @click="active('employees', 'menu')" v-if="accessAdmin">
-                            <router-link :to="'/employees'">
+                            <router-link :to="'/admin/employees'">
                                 <i class="fas fa-user-tie"></i>
                                 Персонал
                             </router-link>
                         </li>
                         <li :class="{ 'active': menu.isActive.appointments, 'has-sub': menu.isActive.appointments}" @click="active('appointments', 'menu')" v-if="accessAdmin">
-                            <router-link :to="'/appointments'">
+                            <router-link :to="'/admin/appointments'">
                                 <i class="fas fa-trophy"></i>
                                 Должности
                             </router-link>
                         </li>
                         <li :class="{ 'active': menu.isActive.users, 'has-sub': menu.isActive.users}" @click="active('users', 'menu')" v-if="accessAdmin">
-                            <router-link :to="'/users'">
+                            <router-link :to="'/admin/users'">
                                 <i class="fas fa-users"></i>
                                 Пользователи
                             </router-link>

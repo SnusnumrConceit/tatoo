@@ -87,7 +87,7 @@
       },
 
       async loadMasters() {
-        const response = await axios.get('/tatoos/masters/2');
+        const response = await axios.get(`/tatoos/${this.tmp_order.id}/masters/`);
         if (response.status !== 200 || response.data.status === 'error') {
           this.$swal('Ошибка!', response.data.msg, 'error');
           return false;

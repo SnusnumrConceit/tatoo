@@ -4169,9 +4169,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
                 this.order = response.data.order;
+
+                if (this.$route.params.id) {
+                  this.loadMasters();
+                }
+
                 return _context2.abrupt("return", true);
 
-              case 8:
+              case 9:
               case "end":
                 return _context2.stop();
             }
@@ -4237,7 +4242,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return axios.get("/tatoos/masters/".concat(this.order.tatoo_id));
+                return axios.get("/tatoos/".concat(this.order.tatoo_id, "/masters/"));
 
               case 2:
                 response = _context4.sent;
@@ -6575,6 +6580,14 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
 //
 //
 //
@@ -6622,7 +6635,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   computed: {},
   methods: {
     showMasterModal: function showMasterModal(master) {
-      this.master_info = master;
+      this.master_info = _objectSpread({}, master, {
+        tatoos: [{}]
+      });
       this.$modal.show('master');
     },
     hideMasterModal: function hideMasterModal() {
@@ -6632,6 +6647,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _loadTatoos = _asyncToGenerator(
       /*#__PURE__*/
       _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        var _this = this;
+
         var response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
@@ -6652,7 +6669,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context.abrupt("return", false);
 
               case 6:
-                this.master_info.tatoos = response.data.tatoos;
+                this.$nextTick(function () {
+                  _this.$set(_this.master_info, 'tatoos', response.data.tatoos);
+                });
 
               case 7:
               case "end":
@@ -6838,7 +6857,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return axios.get('/tatoos/masters/2');
+                return axios.get("/tatoos/".concat(this.tmp_order.id, "/masters/"));
 
               case 2:
                 response = _context.sent;
@@ -46437,7 +46456,7 @@ var render = function() {
                 staticClass: "btn btn-outline-success",
                 on: {
                   click: function($event) {
-                    return _vm.$router.push({ path: "/appointments/create" })
+                    return _vm.$router.push({ name: "appointment_form" })
                   }
                 }
               },
@@ -46548,7 +46567,7 @@ var render = function() {
                             on: {
                               click: function($event) {
                                 return _vm.$router.push({
-                                  path: "/appointments/" + appointment.id
+                                  path: "/admin/appointments/" + appointment.id
                                 })
                               }
                             }
@@ -46961,7 +46980,7 @@ var render = function() {
                   staticClass: "btn btn-outline-success",
                   on: {
                     click: function($event) {
-                      return _vm.$router.push({ path: "/employees/create" })
+                      return _vm.$router.push({ name: "employee_form" })
                     }
                   }
                 },
@@ -47182,7 +47201,7 @@ var render = function() {
                               on: {
                                 click: function($event) {
                                   return _vm.$router.push({
-                                    path: "/employees/" + employee.id
+                                    path: "/admin/employees/" + employee.id
                                   })
                                 }
                               }
@@ -47606,7 +47625,7 @@ var render = function() {
                   staticClass: "btn btn-outline-success",
                   on: {
                     click: function($event) {
-                      return _vm.$router.push({ path: "/orders/create" })
+                      return _vm.$router.push({ name: "order_form" })
                     }
                   }
                 },
@@ -47879,7 +47898,7 @@ var render = function() {
                                 on: {
                                   click: function($event) {
                                     return _vm.$router.push({
-                                      path: "/orders/" + order.id
+                                      path: "/admin/orders/" + order.id
                                     })
                                   }
                                 }
@@ -48226,7 +48245,7 @@ var render = function() {
                   staticClass: "btn btn-outline-success",
                   on: {
                     click: function($event) {
-                      return _vm.$router.push({ path: "/tatoos/create" })
+                      return _vm.$router.push({ name: "tatoo_form" })
                     }
                   }
                 },
@@ -48385,7 +48404,7 @@ var render = function() {
                               on: {
                                 click: function($event) {
                                   return _vm.$router.push({
-                                    path: "/tatoos/" + tatoo.id
+                                    path: "/admin/tatoos/" + tatoo.id
                                   })
                                 }
                               }
@@ -48731,7 +48750,7 @@ var render = function() {
                 staticClass: "btn btn-outline-success",
                 on: {
                   click: function($event) {
-                    return _vm.$router.push({ path: "/users/create" })
+                    return _vm.$router.push({ name: "user_form" })
                   }
                 }
               },
@@ -48924,7 +48943,7 @@ var render = function() {
                             on: {
                               click: function($event) {
                                 return _vm.$router.push({
-                                  path: "/users/" + user.id
+                                  path: "/admin/users/" + user.id
                                 })
                               }
                             }
@@ -49544,22 +49563,32 @@ var render = function() {
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "modal-body" }, [
-            _c(
-              "div",
-              { staticClass: "col-12" },
-              _vm._l(_vm.master_info.tatoos, function(tatoo) {
-                return _c("div", { staticClass: "card col-3" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h2", [_vm._v(_vm._s(tatoo.name))])
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("img", { attrs: { src: tatoo.url, alt: "" } })
-                  ])
-                ])
-              }),
-              0
-            )
+            _c("div", { staticClass: "col-12" }, [
+              _c("p", [_vm._v(_vm._s(_vm.master_info.description))])
+            ]),
+            _vm._v(" "),
+            _vm.master_info.tatoos && _vm.master_info.tatoos.length > 1
+              ? _c(
+                  "div",
+                  { staticClass: "col-12" },
+                  [
+                    _c("h3", [_vm._v("Татуировки")]),
+                    _vm._v(" "),
+                    _vm._l(_vm.master_info.tatoos, function(tatoo) {
+                      return _c("div", { staticClass: "card col-3" }, [
+                        _c("div", { staticClass: "card-header" }, [
+                          _c("h2", [_vm._v(_vm._s(tatoo.name))])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "card-body" }, [
+                          _c("img", { attrs: { src: tatoo.url, alt: "" } })
+                        ])
+                      ])
+                    })
+                  ],
+                  2
+                )
+              : _vm._e()
           ])
         ]
       )
@@ -49999,7 +50028,7 @@ var render = function() {
                         }
                       },
                       [
-                        _c("router-link", { attrs: { to: "/orders" } }, [
+                        _c("router-link", { attrs: { to: "/admin/orders" } }, [
                           _c("i", { staticClass: "far fa-money-bill-alt" }),
                           _vm._v(
                             "\n                            Заказы\n                        "
@@ -50025,7 +50054,7 @@ var render = function() {
                         }
                       },
                       [
-                        _c("router-link", { attrs: { to: "/tatoos" } }, [
+                        _c("router-link", { attrs: { to: "/admin/tatoos" } }, [
                           _c("i", { staticClass: "fab fa-gitkraken" }),
                           _vm._v(
                             "\n                            Татуировки\n                        "
@@ -50051,12 +50080,16 @@ var render = function() {
                         }
                       },
                       [
-                        _c("router-link", { attrs: { to: "/employees" } }, [
-                          _c("i", { staticClass: "fas fa-user-tie" }),
-                          _vm._v(
-                            "\n                            Персонал\n                        "
-                          )
-                        ])
+                        _c(
+                          "router-link",
+                          { attrs: { to: "/admin/employees" } },
+                          [
+                            _c("i", { staticClass: "fas fa-user-tie" }),
+                            _vm._v(
+                              "\n                            Персонал\n                        "
+                            )
+                          ]
+                        )
                       ],
                       1
                     )
@@ -50077,12 +50110,16 @@ var render = function() {
                         }
                       },
                       [
-                        _c("router-link", { attrs: { to: "/appointments" } }, [
-                          _c("i", { staticClass: "fas fa-trophy" }),
-                          _vm._v(
-                            "\n                            Должности\n                        "
-                          )
-                        ])
+                        _c(
+                          "router-link",
+                          { attrs: { to: "/admin/appointments" } },
+                          [
+                            _c("i", { staticClass: "fas fa-trophy" }),
+                            _vm._v(
+                              "\n                            Должности\n                        "
+                            )
+                          ]
+                        )
                       ],
                       1
                     )
@@ -50103,7 +50140,7 @@ var render = function() {
                         }
                       },
                       [
-                        _c("router-link", { attrs: { to: "/users" } }, [
+                        _c("router-link", { attrs: { to: "/admin/users" } }, [
                           _c("i", { staticClass: "fas fa-users" }),
                           _vm._v(
                             "\n                            Пользователи\n                        "
@@ -69586,8 +69623,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/snusnumr/university_repos/tatoo/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /home/snusnumr/university_repos/tatoo/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /home/snusnumr1996/repos/tatoo/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /home/snusnumr1996/repos/tatoo/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

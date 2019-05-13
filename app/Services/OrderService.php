@@ -34,11 +34,14 @@ class OrderService
         try {
             $request->validated();
             $order = new Order();
+            $order->note_date = $this->convertDate($request->note_date, $request->note_time);
+            if (! $this->validateNoteDate($order->note_date)) {
+                throw new \Exception('Проверьте правильность указанной даты');
+            }
             $order->fill([
                 'tatoo_id'  =>  $request->tatoo_id,
                 'user_id'   =>  $request->user_id,
                 'status'    =>  $request->status,
-                'note_date' =>  $this->convertDate($request->note_date, $request->note_time),
                 'master_id' =>  $request->master
             ]);
             $order->save();
@@ -235,14 +238,20 @@ class OrderService
     {
         try {
 //            Validator::make([]);
+            $date = $this->convertDate($request->note_date, $request->note_time);
+            if  (! $this->validateNoteDate($date)) {
+                throw new \Exception('Проверьте корректность даты');
+            }
             $order = (new Order)->fill([
                 'tatoo_id'  => $request->tatoo,
                 'user_id'   => auth()->id(),
                 'master_id' => $request->master['id'],
                 'status'    => 2,
-                'note_date' => $this->convertDate($request->note_date, $request->note_time)
+                'note_date' => $date
             ]);
             $order->save();
+            $mail_order = Order::with(['customer', 'tatoo'])->findOrFail($order->id);
+            event(new OrderCompleted($mail_order));
             return response()->json([
                 'status' => 'success',
                 'msg' => 'Запись успешно совершена!'
@@ -253,5 +262,17 @@ class OrderService
                 'msg' => $error->getMessage()
             ]);
         }
+    }
+
+    public function validateNoteDate($date)
+    {
+        if ($date < Carbon::now()) {
+            return false;
+        }
+        $only_date = Carbon::parse($date)->format('Y-m-d');
+        if ($date < $only_date . ' 09:00' || $date > $only_date . ' 22:00') {
+            return false;
+        }
+        return true;
     }
 }

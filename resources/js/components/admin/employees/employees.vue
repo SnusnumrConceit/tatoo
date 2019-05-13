@@ -7,7 +7,7 @@
                         <h2 class="title-1 m-b-25">Персонал</h2>
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-outline-success" @click="$router.push({ path: '/employees/create' })">
+                        <button class="btn btn-outline-success" @click="$router.push({ name: 'employee_form' })">
                             Добавить
                         </button>
                     </div>
@@ -66,7 +66,7 @@
                             <td>{{ employee.birthday }} </td>
                             <td>{{ employee.created_at }} </td>
                             <td>
-                                <i class="fa fa-cog text-success" @click="$router.push({path: '/employees/' + employee.id})"></i>
+                                <i class="fa fa-cog text-success" @click="$router.push({path: '/admin/employees/' + employee.id})"></i>
                                 <i class="fa fa-trash text-danger" @click="remove(index, employee.id)"></i>
                             </td>
                         </tbody>

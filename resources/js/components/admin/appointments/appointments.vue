@@ -7,7 +7,7 @@
                         <h2 class="title-1 m-b-25">Должности</h2>
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-outline-success" @click="$router.push({ path: '/appointments/create' })">
+                        <button class="btn btn-outline-success" @click="$router.push({ name: 'appointment_form' })">
                             Добавить
                         </button>
                     </div>
@@ -48,7 +48,7 @@
                         <tbody v-for="(appointment, index) in appointments" :key="appointment.id">
                             <td>{{ appointment.name }}</td>
                             <td>
-                                <i class="fa fa-cog text-success" @click="$router.push({path: '/appointments/' + appointment.id})"></i>
+                                <i class="fa fa-cog text-success" @click="$router.push({path: '/admin/appointments/' + appointment.id})"></i>
                                 <i class="fa fa-trash text-danger" @click="remove(index, appointment.id)"></i>
                             </td>
                         </tbody>

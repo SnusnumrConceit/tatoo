@@ -7,7 +7,7 @@
                         <h2 class="title-1 m-b-25">Татуировки</h2>
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-outline-success" @click="$router.push({ path: '/tatoos/create' })">
+                        <button class="btn btn-outline-success" @click="$router.push({ name: 'tatoo_form' })">
                             Добавить
                         </button>
                     </div>
@@ -54,7 +54,7 @@
                             <td @click="showModal(tatoo.id)">{{ tatoo.name }}</td>
                             <td>{{ tatoo.price }} ₽</td>
                             <td>
-                                <i class="fa fa-cog text-success" @click="$router.push({path: '/tatoos/' + tatoo.id})"></i>
+                                <i class="fa fa-cog text-success" @click="$router.push({path: '/admin/tatoos/' + tatoo.id})"></i>
                                 <i class="fa fa-trash text-danger" @click="remove(index, tatoo.id)"></i>
                             </td>
                         </tbody>

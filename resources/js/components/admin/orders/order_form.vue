@@ -136,6 +136,9 @@
           return false;
         }
         this.order = response.data.order;
+          if (this.$route.params.id) {
+              this.loadMasters();
+          }
         return true;
       },
 
@@ -151,7 +154,7 @@
       },
 
       async loadMasters() {
-        const response = await axios.get(`/tatoos/masters/${this.order.tatoo_id}`);
+        const response = await axios.get(`/tatoos/${this.order.tatoo_id}/masters/`);
         if (response.status !== 200 || response.data.status === 'error') {
           this.$swal('Ошибка!', response.data.msg, 'error');
           return false;
@@ -174,7 +177,7 @@
         this.loadData();
       }
       this.loadExtendsData();
-    }
+    },
   }
 </script>
 

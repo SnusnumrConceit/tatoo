@@ -17,16 +17,20 @@
                 {{ master_info.name }}
             </div>
             <div class="modal-body">
-                    <div class="col-12">
-                        <div class="card col-3" v-for="tatoo in master_info.tatoos">
-                            <div class="card-header">
-                                <h2>{{ tatoo.name }}</h2>
-                            </div>
-                            <div class="card-body">
-                                <img :src="tatoo.url" alt="">
-                            </div>
+                <div class="col-12">
+                    <p>{{ master_info.description }}</p>
+                </div>
+                <div class="col-12" v-if="master_info.tatoos && master_info.tatoos.length > 1">
+                    <h3>Татуировки</h3>
+                    <div class="card col-3" v-for="tatoo in master_info.tatoos">
+                        <div class="card-header">
+                            <h2>{{ tatoo.name }}</h2>
+                        </div>
+                        <div class="card-body">
+                            <img :src="tatoo.url" alt="">
                         </div>
                     </div>
+                </div>
             </div>
         </modal>
     </div>
@@ -47,7 +51,7 @@
     computed: {},
     methods: {
       showMasterModal(master) {
-        this.master_info  = master;
+        this.master_info  = { ...master, tatoos: [{}]};
         this.$modal.show('master');
       },
 
@@ -61,7 +65,9 @@
           this.$swal('Ошибка!', response.data.msg, 'error');
           return false;
         }
-        this.master_info.tatoos = response.data.tatoos;
+        this.$nextTick(() => {
+            this.$set(this.master_info, 'tatoos', response.data.tatoos);
+        });
       },
 
       async loadData() {

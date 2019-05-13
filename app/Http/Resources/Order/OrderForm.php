@@ -25,7 +25,8 @@ class OrderForm extends JsonResource
             'tatoo_id'  =>  $this->tatoo_id,
             'note_date' =>  Carbon::parse($this->note_date)->format('Y-m-d'),
             'note_time' =>  $this->getTime($this->note_date),
-            'user_id'   =>  $this->user_id
+            'user_id'   =>  $this->user_id,
+            'master'    =>  $this->master
         ];
     }
 

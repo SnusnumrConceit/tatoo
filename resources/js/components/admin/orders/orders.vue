@@ -7,7 +7,7 @@
                         <h2 class="title-1 m-b-25">Заказы</h2>
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-outline-success" @click="$router.push({ path: '/orders/create' })">
+                        <button class="btn btn-outline-success" @click="$router.push({ name: 'order_form' })">
                             Добавить
                         </button>
                     </div>
@@ -79,7 +79,7 @@
                                 <td>{{ order.status }}</td>
                                 <td>{{ order.created_at }} </td>
                                 <td>
-                                    <i class="fa fa-cog text-success" @click="$router.push({path: '/orders/' + order.id})"></i>
+                                    <i class="fa fa-cog text-success" @click="$router.push({path: '/admin/orders/' + order.id})"></i>
                                     <i class="fa fa-trash text-danger" @click="remove(index, order.id)"></i>
                                 </td>
                             </tr>

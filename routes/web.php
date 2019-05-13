@@ -94,7 +94,7 @@ Route::group([
     Route::post('/remove/{id}', 'TatooController@destroy')
         ->where('id', '[0-9]+');
     Route::get('/export', 'TatooController@export');
-    Route::get('/masters/{id}', 'TatooController@getTatooMasters')
+    Route::get('/{id}/masters', 'TatooController@getTatooMasters')
         ->where('id', '[0-9]+');
 });
 
