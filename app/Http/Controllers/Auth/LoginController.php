@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\WriteAudit;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -52,6 +53,7 @@ class LoginController extends Controller
                 throw new JWTException('Неверные данные');
             }
             Auth::attempt($credentials);
+            $this->makeLog(auth()->user(), 17, 1);
             return response()->json([
                 'user' => Auth::user(),
                 'token' => $token,
@@ -68,7 +70,9 @@ class LoginController extends Controller
     public function logout()
     {
         try {
+            $user = auth()->user();
             auth()->logout();
+            $this->makeLog($user, 18, 1);
             return response()->json([
                 'status' => 'success'
             ], 200);
@@ -78,5 +82,20 @@ class LoginController extends Controller
                 'msg' => $error->getMessage()
             ]);
         }
+    }
+
+    public function makeLog($subject, $type, $status)
+    {
+        switch ($status) {
+            case 1: $status = json_decode((object)['status' => 'success']); break;
+            case 2: $status = json_decode((object)['status' => 'error']); break;
+            default: break;
+        }
+        $subject = json_decode((object)[
+            'id' => ($type !== 15) ? $subject->id : null,
+            'type' => 'user',
+            'email' => $subject->email
+        ]);
+        event(new WriteAudit($subject, $type, $status));
     }
 }

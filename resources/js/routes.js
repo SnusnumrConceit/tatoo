@@ -13,6 +13,8 @@ import EmployeeForm from './components/admin/employees/employee_form';
 import Orders from './components/admin/orders/orders';
 import OrderForm from './components/admin/orders/order_form';
 
+import Audit from './components/admin/audit/audit';
+
 import Contacts from './components/public/content/contacts';
 import PublicTatoos from './components/public/content/tatoos_public';
 import PublicMasters from './components/public/content/masters_public';
@@ -92,6 +94,11 @@ export const routes = [
     name: 'appointment_form',
     path: '/admin/appointments/:id',
     component: AppointmentForm
+  },
+  {
+    name: 'audit',
+    path: '/admin/audit',
+    component: Audit
   },
 
   /***

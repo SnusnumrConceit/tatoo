@@ -9,6 +9,7 @@
 namespace App\Services;
 
 
+use App\Events\WriteAudit;
 use App\Exports\MasterExport;
 use App\Http\Resources\Admin\Employee\EmployeeCollection;
 use App\Http\Resources\Admin\Employee\EmployeeInfo;
@@ -59,6 +60,7 @@ class EmployeeService
                 'url'            => $request->destination
             ]);
             $employee->save();
+            $this->makeLog($employee, 7, 1);
             if (! empty($request->tatoos)) {
                 $this->addTatoos($employee->id, $request->tatoos);
             }
@@ -220,6 +222,7 @@ class EmployeeService
                 'url' => $url
             ]);
             $employee->save();
+            $this->makeLog($employee, 8, 1);
             if (! empty($request->tatoos)) {
                 $this->removeTatoos($employee->id);
                 $this->addTatoos($employee->id, $request->tatoos);
@@ -246,6 +249,7 @@ class EmployeeService
     {
         try {
             $employee = Employee::findOrFail($id);
+            $this->makeLog($employee, 9, 1);
             $employee->delete();
             return response()->json([
                 'status' => 'success',
@@ -288,7 +292,10 @@ class EmployeeService
     public function getTatoos($id)
     {
         try {
-            $master = Employee::with('tatoos')->findOrFail($id);
+            $master = Employee::findOrFail($id);
+            foreach ($master->tatoos as $tatoo) {
+                $tatoo->url = str_replace('public', 'storage', $tatoo->url);
+            }
             return response()->json([
                 'tatoos' => $master->tatoos
             ], 200);
@@ -298,5 +305,19 @@ class EmployeeService
                 'msg' => $error->getMessage()
             ]);
         }
+    }
+
+    public function makeLog($subject, $type, $status)
+    {
+        switch ($status) {
+            case 1: $status = json_encode((object)['status' => 'success']); break;
+            case 2: $status = json_encode((object)['status' => 'error']); break;
+            default: break;
+        }
+        $subject = json_encode((object)[
+            'id' => $subject->id,
+            'type' => 'employee',
+            'name' => $subject->name]);
+        event(new WriteAudit($subject, $type, $status));
     }
 }

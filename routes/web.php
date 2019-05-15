@@ -129,3 +129,8 @@ Route::group(['namespace' => 'Auth'], function () {
 });
 
 //Route::get('/home', 'HomeController@index')->name('home');
+
+
+Route::group(['prefix' => 'audits'], function () {
+    Route::get('/', 'AuditController@store');
+});

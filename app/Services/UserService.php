@@ -9,6 +9,7 @@
 namespace App\Services;
 
 
+use App\Events\WriteAudit;
 use App\Exports\UserExport;
 use App\Http\Resources\Admin\User\UserCollection;
 use App\Http\Resources\Admin\User\UserInfo;
@@ -42,6 +43,7 @@ class UserService
                 'birthday'   => $this->convertDate($request->birthday)
             ]);
             $user->save();
+            $this->makeLog($user, 1, 1);
             return response()->json([
                 'status' => 'success',
                 'msg'    => 'Пользователь успешно добавлен в систему!'
@@ -171,6 +173,7 @@ class UserService
                 'birthday'   => $this->convertDate($request->birthday)
             ]);
             $user->save();
+            $this->makeLog($user, 2, 1);
             return response()->json([
                 'status' => 'success',
                 'msg'    => 'Пользователь успешно обновлён!'
@@ -193,6 +196,7 @@ class UserService
     {
         try {
             $user = User::findOrFail($id);
+            $this->makeLog($user, 3, 1);
             $user->delete();
             return response()->json([
                 'status' => 'success',
@@ -214,5 +218,19 @@ class UserService
     public function convertDate($date)
     {
         return Carbon::parse($date)->format('Y-m-d');
+    }
+
+    public function makeLog($subject, $type, $status)
+    {
+        switch ($status) {
+            case 1: $status = json_encode((object)['status' => 'success']); break;
+            case 2: $status = json_encode((object)['status' => 'error']); break;
+            default: break;
+        }
+        $subject = json_encode((object)[
+            'id' => $subject->id,
+            'type' => 'user',
+            'name' => $subject->last_name.' '. $subject->first_name]);
+        event(new WriteAudit($subject, $type, $status));
     }
 }

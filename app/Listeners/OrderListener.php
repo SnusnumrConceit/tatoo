@@ -26,7 +26,7 @@ class OrderListener
      * @param  object  $event
      * @return void
      */
-    public function handle(OrderCompleted$event)
+    public function handle(OrderCompleted $event)
     {
         Mail::to($event->order->customer)->send(new OrderMail(
             $event->order

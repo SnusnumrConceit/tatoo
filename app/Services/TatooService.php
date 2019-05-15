@@ -8,6 +8,7 @@
 
 namespace App\Services;
 
+use App\Events\WriteAudit;
 use App\Exports\TatooExport;
 use App\Http\Resources\Admin\Tatoo\TatooCollection;
 use App\Http\Resources\Admin\Tatoo\TatooInfo;
@@ -51,6 +52,7 @@ class TatooService
                 'url'         => $request->destination
             ]);
             $tatoo->save();
+            $this->makeLog($tatoo, 4, 1);
             return response()->json([
                 'status' => 'success',
                 'msg' => 'Тату успешно добавлена в систему!'
@@ -183,6 +185,7 @@ class TatooService
                 'url'         => $url
             ]);
             $tatoo->save();
+            $this->makeLog($tatoo, 5, 1);
             return response()->json([
                 'status' => 'success',
                 'msg' => 'Тату успешно обновлена!'
@@ -205,6 +208,7 @@ class TatooService
     {
         try {
             $tatoo = Tatoo::findOrFail($id);
+            $this->makeLog($tatoo, 6, 1);
             $tatoo->delete();
             return response()->json([
                 'status' => 'success',
@@ -241,5 +245,19 @@ class TatooService
                 'msg' => $error->getMessage()
             ]);
         }
+    }
+
+    public function makeLog($subject, $type, $status)
+    {
+        switch ($status) {
+            case 1: $status = json_encode((object)['status' => 'success']); break;
+            case 2: $status = json_encode((object)['status' => 'error']); break;
+            default: break;
+        }
+        $subject = json_encode((object)[
+            'id' => ($type !== 3) ? $subject->id : null,
+            'type' => 'tatoo',
+            'name' => $subject->name]);
+        event(new WriteAudit($subject, $type, $status));
     }
 }

@@ -1,53 +1,61 @@
 <template>
     <div class="container-fluid">
         <div class="container-content">
-            <header class="row">
-                <h2 class="col-2">
-                    Tatoo.ru
-                </h2>
-                <div class="offset-7" v-if="! user">
-                    <button class="btn btn-link" @click="showModal('registration')">
-                        Регистрация
-                    </button>
-                    <button class="btn btn-link" @click="showModal('login')">
-                        Войти
-                    </button>
+            <header>
+                <div class="row">
+                    <h2 class="col-2">
+                    </h2>
+                    <div class="offset-7" v-if="! user">
+                        <button class="btn btn-link" @click="showModal('registration')">
+                            Регистрация
+                        </button>
+                        <button class="btn btn-link" @click="showModal('login')">
+                            Войти
+                        </button>
+                    </div>
+                    <div class="offset-7" v-else>
+                        <button class="btn btn-link" @click="showModal('cabinet')">
+                            {{ user.last_name }} {{ user.first_name }}
+                        </button>
+                        <button class="btn btn-link" @click="logout">
+                            Выйти
+                        </button>
+                    </div>
                 </div>
-                <div class="offset-7" v-else>
-                    <button class="btn btn-link" @click="showModal('cabinet')">
-                        {{ user.last_name }} {{ user.first_name }}
-                    </button>
-                    <button class="btn btn-link" @click="logout">
-                        Выйти
-                    </button>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="logo">
+                            <h2 class="text-center text-info">Tatoo.ru</h2>
+                        </div>
+                    </div>
                 </div>
             </header>
             <main>
                 <div class="">
                     <ul class="nav justify-content-center row nav-tabs">
-                        <li :class="(tabs.main) ? 'active' : ''"
-                            class="nav-link col-3 tab"
-                            @click="activate('main')">
-                            <router-link :to="'/main'">
-                                Главная
-                            </router-link>
-                        </li>
+                        <!--<li :class="(tabs.main) ? 'active' : ''"-->
+                            <!--class="nav-link col-3 tab"-->
+                            <!--@click="activate('main')">-->
+                            <!--<router-link :to="'/main'">-->
+                                <!--Главная-->
+                            <!--</router-link>-->
+                        <!--</li>-->
                         <li :class="(tabs.public_tatoos) ? 'active' : ''"
-                            class="nav-link col-3 tab"
+                            class="nav-link col-4 tab"
                             @click="activate('public_tatoos')">
                             <router-link :to="'/tatoos'">
                                 Татуировки
                             </router-link>
                         </li>
                         <li :class="(tabs.public_masters) ? 'active' : ''"
-                            class="nav-link col-3 tab"
+                            class="nav-link col-4 tab"
                             @click="activate('public_masters')">
                             <router-link :to="'/masters'">
                                 Мастера
                             </router-link>
                         </li>
                         <li :class="(tabs.contacts) ? 'active' : ''"
-                            class="nav-link col-3 tab"
+                            class="nav-link col-4 tab"
                             @click="activate('contacts')">
                             <router-link :to="'/contacts'">
                                 Контакты
@@ -153,7 +161,7 @@
         }
 
         .tab:hover {
-            background: #2b6fb9;
+            background: #000000;
             cursor: pointer;
             a {
                 color: #fff;
@@ -162,14 +170,30 @@
     }
 
     a {
-        color: #2b6fb9;
+        color: #000;
+        text-decoration: none;
     }
     .container-content {
         height: 97vh;
     }
 
     .btn-link {
-        color: #d05d06;
+        color: #000;
         font-size: 1.3em;
+        text-decoration: none;
     }
+
+    .logo {
+        padding: 50px 0px;
+        background: #000;
+        h2 {
+            color: #fff;
+        }
+    }
+    .nav-tabs {
+        .nav-link {
+            border:none;
+        }
+    }
+
 </style>

@@ -12,7 +12,7 @@
                 </div>
             </div>
         </div>
-        <modal name="master" @before-open="loadTatoos" :height="400" :scrollable="true">
+        <modal name="master" @before-open="loadTatoos" :height="'auto'" :scrollable="true">
             <div class="modal-header">
                 {{ master_info.name }}
             </div>
@@ -22,7 +22,9 @@
                 </div>
                 <div class="col-12" v-if="master_info.tatoos && master_info.tatoos.length > 1">
                     <h3>Татуировки</h3>
-                    <div class="card col-3" v-for="tatoo in master_info.tatoos">
+                </div>
+                <div class="col-12">
+                    <div class="card col-6" v-for="tatoo in master_info.tatoos">
                         <div class="card-header">
                             <h2>{{ tatoo.name }}</h2>
                         </div>

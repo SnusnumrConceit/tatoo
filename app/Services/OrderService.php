@@ -10,6 +10,7 @@ namespace App\Services;
 
 
 use App\Events\OrderCompleted;
+use App\Events\WriteAudit;
 use App\Exports\OrderExport;
 use App\Http\Resources\Admin\Order\OrderCollection;
 use App\Http\Resources\Admin\Order\OrderCustomerExtendsCollection;
@@ -46,6 +47,7 @@ class OrderService
             ]);
             $order->save();
             $mail_order = Order::with(['customer', 'tatoo'])->findOrFail($order->id);
+            $this->makeLog($order, 13 ,1);
             event(new OrderCompleted($mail_order));
             return response()->json([
                 'status'  =>  'success',
@@ -190,6 +192,7 @@ class OrderService
                 'master_id' =>  $request->master
             ]);
             $order->save();
+            $this->makeLog($order, 14, 1);
             return response()->json([
                 'status'  =>  'success',
                 'msg'     =>  'Заказ успешно обновлён'
@@ -211,7 +214,9 @@ class OrderService
     public function destroy($id)
     {
         try {
-            Order::findOrFail($id)->delete();
+            $order = Order::findOrFail($id);
+            $this->makeLog($order, 15, 1);
+            $order->delete();
             return response()->json([
                 'status' => 'success',
                 'msg' => 'Заказ успешно удалён'
@@ -274,5 +279,21 @@ class OrderService
             return false;
         }
         return true;
+    }
+
+    public function makeLog($subject, $type, $status)
+    {
+        switch ($status) {
+            case 1: $status = json_encode((object)['status' => 'success']); break;
+            case 2: $status = json_encode((object)['status' => 'error']); break;
+            default: break;
+        }
+        $subject = json_encode((object)[
+            'id' => ($type !== 15) ? $subject->id : null,
+            'type' => 'order',
+            'customer' => $subject->user_id,
+            'tatoo' => $subject->tatoo_id
+        ]);
+        event(new WriteAudit($subject, $type, $status));
     }
 }

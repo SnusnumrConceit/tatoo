@@ -9,6 +9,7 @@
 namespace App\Services;
 
 
+use App\Events\WriteAudit;
 use App\Exports\AppointmentExport;
 use App\Models\Appointment;
 use Maatwebsite\Excel\Facades\Excel;
@@ -36,6 +37,7 @@ class AppointmentService
                 'name' => $request->appointment
             ]);
             $appointment->save();
+            $this->makeLog($appointment, 10, 1);
             return response()->json([
                 'status' => 'success',
                 'msg'    => 'Должность успешно добавлена'
@@ -137,6 +139,7 @@ class AppointmentService
                 'name' => $request->appointment
             ]);
             $appointment->save();
+            $this->makeLog($appointment, 11, 1);
             return response()->json([
                 'status' => 'success',
                 'msg'    => 'Должность успешно обновлена'
@@ -158,7 +161,9 @@ class AppointmentService
     public function destroy(int $id)
     {
         try {
-            $appointment = Appointment::findOrFail($id)->delete();
+            $appointment = Appointment::findOrFail($id);
+            $this->makeLog($appointment, 12, 1);
+            $appointment->delete();
             return response()->json([
                 'status' => 'success',
                 'msg'    => 'Должность успешно удалена'
@@ -174,5 +179,19 @@ class AppointmentService
     public function export()
     {
         return new AppointmentExport();
+    }
+
+    public function makeLog($subject, $type, $status)
+    {
+        switch ($status) {
+            case 1: $status = json_encode((object)['status' => 'success']); break;
+            case 2: $status = json_encode((object)['status' => 'error']); break;
+            default: break;
+        }
+        $subject = json_encode((object)[
+            'id' => $subject->id,
+            'type' => 'appointment',
+            'name' => $subject->name]);
+        event(new WriteAudit($subject, $type, $status));
     }
 }

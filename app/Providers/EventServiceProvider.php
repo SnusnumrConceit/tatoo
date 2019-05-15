@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Events\OrderCompleted;
+use App\Events\WriteAudit;
+use App\Listeners\AuditListener;
 use App\Listeners\OrderListener;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
@@ -23,6 +25,9 @@ class EventServiceProvider extends ServiceProvider
         OrderCompleted::class => [
             OrderListener::class
         ],
+        WriteAudit::class => [
+            AuditListener::class
+        ]
 
     ];
 

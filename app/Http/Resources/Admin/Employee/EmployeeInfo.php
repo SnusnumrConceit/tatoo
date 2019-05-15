@@ -15,7 +15,7 @@ class EmployeeInfo extends JsonResource
     public function toArray($request)
     {
         return [
-            'name'          => $this->name,
+            'name'          =>  $this->name,
             'description'   =>  $this->description,
             'appointment'   =>  $this->appointment->name,
             'url'           =>  $this->setPath($this->url),
