@@ -43,7 +43,8 @@ class OrderService
                 'tatoo_id'  =>  $request->tatoo_id,
                 'user_id'   =>  $request->user_id,
                 'status'    =>  $request->status,
-                'master_id' =>  $request->master
+                'master_id' =>  $request->master,
+                'note_end'  =>  Carbon::parse($order->note_date)->addHours(4)
             ]);
             $order->save();
             $mail_order = Order::with(['customer', 'tatoo'])->findOrFail($order->id);
@@ -277,6 +278,15 @@ class OrderService
         $only_date = Carbon::parse($date)->format('Y-m-d');
         if ($date < $only_date . ' 09:00' || $date > $only_date . ' 22:00') {
             return false;
+        }
+        $range = Order::whereBetween('note_date', [$only_date. ' 00:00', $only_date. ' 23:59'])->get();
+        if (! count($range)) {
+            return true;
+        }
+        foreach ($range as $note_record) {
+            if ($date >= $note_record->note_date && $date <= $note_record->note_end) {
+                return false;
+            }
         }
         return true;
     }
