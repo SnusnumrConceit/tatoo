@@ -17,6 +17,8 @@ use App\Http\Resources\UserCartInfo;
 use App\Model\Order;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Kodeine\Acl\Models\Eloquent\Role;
 use Maatwebsite\Excel\Facades\Excel;
 
 class UserService
@@ -42,6 +44,8 @@ class UserService
                 'email'      => $request->email,
                 'birthday'   => $this->convertDate($request->birthday)
             ]);
+            $this->removeUserRoles($user->id);
+            $this->addRole($user->id, $request->role[0]['id']);
             $user->save();
             $this->makeLog($user, 1, 1);
             return response()->json([
@@ -141,7 +145,7 @@ class UserService
     public function edit($id)
     {
         try {
-            $user = User::findOrFail($id);
+            $user = User::with('role')->findOrFail($id);
             return response()->json([
                 'user' => $user
             ], 200);
@@ -173,6 +177,8 @@ class UserService
                 'birthday'   => $this->convertDate($request->birthday)
             ]);
             $user->save();
+            $this->removeUserRoles($user->id);
+            $this->addRole($user->id, $request->role[0]['id']);
             $this->makeLog($user, 2, 1);
             return response()->json([
                 'status' => 'success',
@@ -198,6 +204,7 @@ class UserService
             $user = User::findOrFail($id);
             $this->makeLog($user, 3, 1);
             $user->delete();
+            $this->removeUserRoles($id);
             return response()->json([
                 'status' => 'success',
                 'msg'    => 'Пользователь успешно удалён!'
@@ -232,5 +239,32 @@ class UserService
             'type' => 'user',
             'name' => $subject->last_name.' '. $subject->first_name]);
         event(new WriteAudit($subject, $type, $status));
+    }
+
+    public function removeUserRoles($id) {
+        DB::table('role_user')
+            ->where('user_id', $id)
+            ->delete();
+    }
+
+    public function addRole($user_id, $role_id)
+    {
+        $user_role = ['user_id' => $user_id, 'role_id' => $role_id];
+        DB::table('role_user')->insert($user_role);
+    }
+
+    public function getRoles()
+    {
+        try {
+            $roles = Role::all();
+            return response()->json([
+                'roles' => $roles
+            ], 200);
+        } catch (\Exception $error) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => $error->getMessage()
+            ]);
+        }
     }
 }

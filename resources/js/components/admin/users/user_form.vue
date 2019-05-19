@@ -34,6 +34,11 @@
                 </datepicker>
             </div>
             <div class="form-group col-4">
+                <v-select v-model="user.role" label="name" :options="roles">
+                    <span slot="no-options">Не найдено ни одной роли</span>
+                </v-select>
+            </div>
+            <div class="form-group col-4">
                 <button class="btn btn-outline-success" v-if="$route.params.id" @click="save">
                     Сохранить
                 </button>
@@ -63,7 +68,8 @@
           password: '',
           first_name: '',
           last_name: '',
-          birthday: Date.now()
+          birthday: Date.now(),
+          role: ''
         },
 
         ru: ru,
@@ -73,6 +79,8 @@
           errors: [],
           message: ``
         },
+
+        roles: []
       }
     },
     methods: {
@@ -128,12 +136,23 @@
                         </ul>
                 </div>`
             : '';
+      },
+
+      async loadExtends() {
+        const response = await axios.get('/roles');
+        if (response.status !== 200 || response.data.status === 'error') {
+          this.$swal('Ошибка!', response.data.msg, 'error');
+          return false;
+        }
+        this.roles = response.data.roles;
+        return true;
       }
     },
     created() {
       if (this.$route.params.id) {
         this.loadData();
       }
+      this.loadExtends();
     }
   }
 </script>

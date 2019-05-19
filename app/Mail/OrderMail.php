@@ -29,8 +29,7 @@ class OrderMail extends Mailable
      */
     public function build()
     {
-//        $url = (auth()->user()->hasRole('superadmin|admin')) ? 'http://tatoo.ru/admin/#/admin/orders' : 'http://booking.ru/?#/rooms';
-        $url = 'http://tatoo.ru/#/orders';
+        $url = (auth()->user()->hasRole('superadmin|admin')) ? 'http://tatoo.ru/#/admin/orders' : 'http://tatoo.ru/home/?#/tatoos';
         return $this->from('tatoo.ru@world.info')->markdown('emails.orders.shipping')
             ->with([
                 'tatoo_name'        => $this->order->tatoo->name,

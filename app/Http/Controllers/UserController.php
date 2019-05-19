@@ -97,4 +97,9 @@ class UserController extends Controller
     {
         return $this->user->export();
     }
+
+    public function getRoles()
+    {
+        return $this->user->getRoles();
+    }
 }

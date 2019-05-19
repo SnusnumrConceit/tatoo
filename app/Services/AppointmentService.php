@@ -59,7 +59,7 @@ class AppointmentService
     public function store($request)
     {
         try {
-            $appointments = Appointment::paginate(25);
+            $appointments = Appointment::with('employee')->paginate(25);
             return response()->json([
                 'appointments' => $appointments
             ], 200);
@@ -82,7 +82,7 @@ class AppointmentService
                 $filter = json_decode($request->filter);
                 $query = $query->orderBy($filter->name, $filter->type);
             }
-            $appointments = $query->paginate(25);
+            $appointments = $query->with('employee')->paginate(25);
             return response()->json([
                 'appointments' => $appointments
             ], 200);

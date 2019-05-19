@@ -19,86 +19,110 @@ import Contacts from './components/public/content/contacts';
 import PublicTatoos from './components/public/content/tatoos_public';
 import PublicMasters from './components/public/content/masters_public';
 
+import Login from './components/templates/admin/login';
+
+const isAdmin = (to, from, next) => {
+  let user = localStorage.getItem('user');
+  user = (user !== undefined) ? JSON.parse(user) : '';
+  (user.role === 'admin') ? next() : next('/login');
+};
+
 export const routes = [
   {
     name: 'users',
     path: '/admin/users',
-    component: Users
+    component: Users,
+    beforeEnter: isAdmin
   },
   {
     name: 'user_form',
     path: '/admin/users/create',
-    component: UserForm
+    component: UserForm,
+    beforeEnter: isAdmin
   },
   {
     name: 'user_form',
     path: '/admin/users/:id',
-    component: UserForm
+    component: UserForm,
+    beforeEnter: isAdmin
   },
   {
     name: 'tatoos',
     path: '/admin/tatoos',
-    component: Tatoos
+    component: Tatoos,
+    beforeEnter: isAdmin
   },
   {
     name: 'tatoo_form',
     path: '/admin/tatoos/create',
-    component: TatooForm
+    component: TatooForm,
+    beforeEnter: isAdmin
   },
   {
     name: 'tatoo_form',
     path: '/admin/tatoos/:id',
-    component: TatooForm
+    component: TatooForm,
+    beforeEnter: isAdmin
   },
   {
     name: 'employees',
     path: '/admin/employees',
-    component: Employees
+    component: Employees,
+    beforeEnter: isAdmin
   },
   {
     name: 'employee_form',
     path: '/admin/employees/create',
-    component: EmployeeForm
+    component: EmployeeForm,
+    beforeEnter: isAdmin
   },
   {
     name: 'employee_form',
     path: '/admin/employees/:id',
-    component: EmployeeForm
+    component: EmployeeForm,
+    beforeEnter: isAdmin
   },
   {
     name: 'orders',
     path: '/admin/orders',
-    component: Orders
+    component: Orders,
+    beforeEnter: isAdmin
   },
   {
     name: 'order_form',
     path: '/admin/orders/create',
-    component: OrderForm
+    component: OrderForm,
+    beforeEnter: isAdmin
   },
   {
     name: 'order_form',
     path: '/admin/orders/:id',
-    component: OrderForm
+    component: OrderForm,
+    beforeEnter: isAdmin
   },
   {
     name: 'appointments',
     path: '/admin/appointments',
-    component: Appointments
+    component: Appointments,
+    beforeEnter: isAdmin
   },
   {
     name: 'appointment_form',
     path: '/admin/appointments/create',
-    component: AppointmentForm
+    component: AppointmentForm,
+    beforeEnter: isAdmin
   },
   {
     name: 'appointment_form',
     path: '/admin/appointments/:id',
-    component: AppointmentForm
+    component: AppointmentForm,
+    beforeEnter: isAdmin
   },
   {
     name: 'audit',
     path: '/admin/audit',
-    component: Audit
+    component: Audit,
+    beforeEnter: isAdmin
   },
 
   /***
@@ -121,4 +145,9 @@ export const routes = [
     path: '/masters',
     component: PublicMasters
   },
+  {
+    name: 'login',
+    path: '/login',
+    component: Login
+  }
 ];

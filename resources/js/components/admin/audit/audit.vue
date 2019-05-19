@@ -95,7 +95,7 @@
         }
       },
 
-      switchPage($page) {
+      switchPage(page) {
         this.pagination.page = page;
         this.loadData();
       },

@@ -253,7 +253,8 @@ class OrderService
                 'user_id'   => auth()->id(),
                 'master_id' => $request->master['id'],
                 'status'    => 2,
-                'note_date' => $date
+                'note_date' => $date,
+                'note_end'  =>  Carbon::parse($date)->addHours(4)
             ]);
             $order->save();
             $mail_order = Order::with(['customer', 'tatoo'])->findOrFail($order->id);

@@ -15,7 +15,7 @@
                     </div>
                     <div class="offset-7" v-else>
                         <button class="btn btn-link" @click="showModal('cabinet')">
-                            {{ user.last_name }} {{ user.first_name }}
+                            {{ user.full_name }}
                         </button>
                         <button class="btn btn-link" @click="logout">
                             Выйти

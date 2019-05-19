@@ -1,18 +1,18 @@
 @component('mail::message')
 
-    Здравствуйте, {{ $customer_name }}!
+Здравствуйте, {{ $customer_name }}!
 
-    Вы записались на сеанс тату:
+Вы записались на сеанс тату:
 
-    Название: {{ $tatoo_name }}
-    Стоимость: {{ $price }} дней.
+Название: {{ $tatoo_name }}
+Стоимость: {{ $price }} дней.
 
-    Дата и время: {{ $order_note_date }}
+Дата и время: {{ $order_note_date }}
 
-    @component('mail::button', ['url' => $url, 'color' => 'primary'])
-        Подробнее
-    @endcomponent
+@component('mail::button', ['url' => $url, 'color' => 'primary'])
+    Подробнее
+@endcomponent
 
-    Спасибо, что пользуетесь услугами <br>
-    {{ config('app.name') }}
+Спасибо, что пользуетесь услугами <br>
+{{ config('app.name') }}
 @endcomponent

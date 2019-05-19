@@ -55,6 +55,8 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 import Admin from './components/templates/admin/admin';
 import General from './components/public/general';
 
+import { mapGetters } from 'vuex';
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -65,5 +67,14 @@ const app = new Vue({
   el: '#app',
   components: {Admin, General},
   store,
-  router
+  router,
+  computed: {
+    isAdmin() {
+      console.log(this.user);
+      return (this.user !== null && this.user.role === 'admin');
+    },
+    ...mapGetters('Auth', {
+      'user': 'getUser'
+    }),
+  },
 });

@@ -15,9 +15,9 @@ Route::get('/', function () {
     return view('admin');
 });
 
-Route::get('/home', function () {
-    return view('home');
-});
+//Route::get('/home', function () {
+//    return view('home');
+//});
 
 Route::group([
     'prefix' => 'users'
@@ -133,4 +133,8 @@ Route::group(['namespace' => 'Auth'], function () {
 
 Route::group(['prefix' => 'audits'], function () {
     Route::get('/', 'AuditController@store');
+});
+
+Route::group([ 'prefix' => 'roles'], function () {
+    Route::get('/', 'UserController@getRoles');
 });

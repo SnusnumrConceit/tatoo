@@ -17,7 +17,7 @@ class AuditService
     public function store()
     {
         try {
-            $audits = Audit::with('event')->paginate(20);
+            $audits = Audit::with('event')->latest('created_at')->paginate(20);
             return response()->json([
                 'audits' => new AuditCollection($audits)
             ]);

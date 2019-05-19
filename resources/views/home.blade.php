@@ -67,7 +67,7 @@
 </head>
 <body>
 <div id="app">
-    <general></general>
+
 </div>
 <script src="{{ mix('/js/app.js') }}"></script>
 </body>

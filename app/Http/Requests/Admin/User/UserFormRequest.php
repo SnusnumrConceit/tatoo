@@ -31,8 +31,9 @@ class UserFormRequest extends FormRequest
             'email'         =>  'required|email|min:10|max:60',
             'password'      =>  'required|min:8|max:50',
             'first_name'    =>  'required|min:3|max:20',
-            'last_name'    =>   'required|min:2|max:30',
+            'last_name'     =>  'required|min:2|max:30',
             'birthday'      =>  'required|date',
+            'role'          =>  'required'
         ];
     }
 

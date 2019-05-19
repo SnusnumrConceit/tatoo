@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Events\WriteAudit;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\Admin\User\UserVuex;
+use App\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -52,10 +54,12 @@ class LoginController extends Controller
             if (! $token = JWTAuth::attempt($credentials)) {
                 throw new JWTException('Неверные данные');
             }
-            Auth::attempt($credentials);
+            Auth::attempt($credentials, true);
             $this->makeLog(auth()->user(), 17, 1);
+            $user = User::with('role')
+                ->findOrFail(auth()->id());
             return response()->json([
-                'user' => Auth::user(),
+                'user' => new UserVuex($user),
                 'token' => $token,
                 'csrf_token' => csrf_token()
             ], 200);
@@ -87,11 +91,11 @@ class LoginController extends Controller
     public function makeLog($subject, $type, $status)
     {
         switch ($status) {
-            case 1: $status = json_decode((object)['status' => 'success']); break;
-            case 2: $status = json_decode((object)['status' => 'error']); break;
+            case 1: $status = json_encode((object)['status' => 'success']); break;
+            case 2: $status = json_encode((object)['status' => 'error']); break;
             default: break;
         }
-        $subject = json_decode((object)[
+        $subject = json_encode((object)[
             'id' => ($type !== 15) ? $subject->id : null,
             'type' => 'user',
             'email' => $subject->email

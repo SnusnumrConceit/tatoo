@@ -49,7 +49,7 @@
                             <td>{{ appointment.name }}</td>
                             <td>
                                 <i class="fa fa-cog text-success" @click="$router.push({path: '/admin/appointments/' + appointment.id})"></i>
-                                <i class="fa fa-trash text-danger" @click="remove(index, appointment.id)"></i>
+                                <i class="fa fa-trash text-danger" @click="remove(index, appointment.id)" v-if="appointment.employee === null"></i>
                             </td>
                         </tbody>
                     </table>

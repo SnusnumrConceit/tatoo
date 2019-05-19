@@ -7,10 +7,12 @@ use App\Models\Tatoo;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Kodeine\Acl\Models\Eloquent\Role;
+use Kodeine\Acl\Traits\HasRole;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasRole;
 
     /**
      * The attributes that are mass assignable.
@@ -42,5 +44,10 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->belongsToMany(Tatoo::class, 'orders', 'user_id', 'tatoo_id');
+    }
+
+    public function role()
+    {
+        return $this->belongsToMany(Role::class);
     }
 }
