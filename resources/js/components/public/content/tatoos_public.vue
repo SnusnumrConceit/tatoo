@@ -13,7 +13,7 @@
                         {{ tatoo.price }} ₽
                     </div>
                     <div class="col-12">
-                        <button class="btn btn-outline-primary" @click="showOrderModal(tatoo)">
+                        <button class="btn btn-outline-primary" @click="showOrderModal(tatoo)" :disabled="! isLogin">
                             Записаться
                         </button>
                     </div>
@@ -55,6 +55,7 @@
   import Datepicker from 'vuejs-datepicker';
   import VueTimepicker from 'vue2-timepicker'
   import {ru,en} from 'vuejs-datepicker/dist/locale';
+  import { mapGetters } from 'vuex';
 
   export default {
     name: "tatoos_public",
@@ -77,7 +78,15 @@
         ru: ru
       }
     },
-    computed: {},
+    computed: {
+      isLogin() {
+        return (Object.keys(this.user).length);
+      },
+
+        ...mapGetters('Auth', {
+          'user': 'getUser'
+        })
+    },
     methods: {
       showOrderModal(tatoo) {
         this.tmp_order  = tatoo;
