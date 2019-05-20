@@ -307,6 +307,23 @@ class EmployeeService
         }
     }
 
+    public function publish($request)
+    {
+        try {
+            $employees = Employee::with(['appointment' => function ($q) {
+                $q->where('name', '=', 'Мастер');
+            }])->paginate(15);
+            return response()->json([
+                'employees' => new EmployeeCollection($employees)
+            ], 200);
+        } catch (\Exception $error) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => $error->getMessage()
+            ]);
+        }
+    }
+
     public function makeLog($subject, $type, $status)
     {
         switch ($status) {

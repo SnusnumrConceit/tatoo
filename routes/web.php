@@ -37,7 +37,7 @@ Route::group([
 });
 
 Route::group(['prefix' => 'masters'], function () {
-    Route::get('/', 'EmployeeController@store');
+    Route::get('/', 'EmployeeController@publish');
     Route::get('/{id}/tatoos', 'EmployeeController@getTatoos')
         ->where('id', '[0-9]+');
 });

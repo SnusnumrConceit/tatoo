@@ -110,4 +110,9 @@ class EmployeeController extends Controller
     {
         return $this->employee->getTatoos($id);
     }
+
+    public function publish(Request $request)
+    {
+        return $this->employee->publish($request);
+    }
 }
