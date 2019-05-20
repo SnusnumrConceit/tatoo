@@ -237,7 +237,7 @@ class OrderService
 
     public function convertDate($date, $time)
     {
-        return Carbon::parse($date)->format('Y-m-d') . ' '. $time['HH'].':'.$time['mm'];
+        return Carbon::parse($date)->addDays(1)->format('Y-m-d') . ' '. $time['HH'].':'.$time['mm'];
     }
 
     public function publish($request)
