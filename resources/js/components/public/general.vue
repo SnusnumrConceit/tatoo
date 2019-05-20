@@ -5,7 +5,7 @@
                 <div class="row">
                     <h2 class="col-2">
                     </h2>
-                    <div class="offset-7" v-if="! user">
+                    <div class="offset-7" v-if="! Object.keys(user).length">
                         <button class="btn btn-link" @click="showModal('registration')">
                             Регистрация
                         </button>
