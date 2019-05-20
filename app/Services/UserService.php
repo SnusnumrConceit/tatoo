@@ -178,7 +178,7 @@ class UserService
             ]);
             $user->save();
             $this->removeUserRoles($user->id);
-            $this->addRole($user->id, $request->role['id']);
+            $this->addRole($user->id, $request->role[0]['id']);
             $this->makeLog($user, 2, 1);
             return response()->json([
                 'status' => 'success',

@@ -248,6 +248,9 @@ class OrderService
             if  (! $this->validateNoteDate($date)) {
                 throw new \Exception('Проверьте корректность даты');
             }
+            if (empty($request->master['id'])) {
+                throw new \Exception('Вы не указали мастера');
+            }
             $order = (new Order)->fill([
                 'tatoo_id'  => $request->tatoo,
                 'user_id'   => auth()->id(),

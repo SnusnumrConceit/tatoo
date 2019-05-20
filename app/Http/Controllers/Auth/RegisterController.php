@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegistrationRequest;
+use App\Services\UserService;
 use App\User;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
@@ -32,15 +33,16 @@ class RegisterController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
-
+    public $user;
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(UserService $user)
     {
         $this->middleware('guest');
+        $this->user = $user;
     }
 
     /**
@@ -83,6 +85,8 @@ class RegisterController extends Controller
             'email'      => $request->email,
             'password'   => Hash::make($request->password)
         ]);
+        $this->user->removeUserRoles($user->id);
+        $this->user->addRole($user->id, 1);
         return (new LoginController())->login(LoginRequest::createFrom($request));
     }
 }
