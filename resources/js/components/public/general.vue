@@ -22,10 +22,15 @@
                         </button>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row header__center">
                     <div class="col-12">
                         <div class="logo">
-                            <h2 class="text-center text-info">Tatoo.ru</h2>
+                            <div class="img">
+                                <img src="/storage/pictures/content/logo.png" alt="">
+                            </div>
+                            <h2 class="text-center text-info">
+                                Tatoo.ru
+                            </h2>
                         </div>
                     </div>
                 </div>
@@ -40,22 +45,29 @@
                                 <!--Главная-->
                             <!--</router-link>-->
                         <!--</li>-->
-                        <li :class="(tabs.public_tatoos) ? 'active' : ''"
-                            class="nav-link col-4 tab"
-                            @click="activate('public_tatoos')">
-                            <router-link :to="'/tatoos'">
-                                Татуировки
-                            </router-link>
-                        </li>
                         <li :class="(tabs.public_masters) ? 'active' : ''"
-                            class="nav-link col-4 tab"
+                            class="nav-link col-3 tab"
                             @click="activate('public_masters')">
                             <router-link :to="'/masters'">
                                 Мастера
                             </router-link>
                         </li>
+                        <li :class="(tabs.public_tatoos) ? 'active' : ''"
+                            class="nav-link col-3 tab"
+                            @click="activate('public_tatoos')">
+                            <router-link :to="'/tatoos'">
+                                Татуировки
+                            </router-link>
+                        </li>
+                        <li :class="(tabs.about) ? 'active' : ''"
+                            class="nav-link col-3 tab"
+                            @click="activate('about')">
+                            <router-link :to="'/about'">
+                                О нас
+                            </router-link>
+                        </li>
                         <li :class="(tabs.contacts) ? 'active' : ''"
-                            class="nav-link col-4 tab"
+                            class="nav-link col-3 tab"
                             @click="activate('contacts')">
                             <router-link :to="'/contacts'">
                                 Контакты
@@ -123,8 +135,9 @@
       },
 
       activate(tab) {
-        this.tab = {};
-        this.tab[tab] = true;
+        this.tabs = {};
+        this.tabs[tab] = true;
+        console.log(this.tab);
         this.$router.push({ name: tab});
       },
 
@@ -167,6 +180,14 @@
                 color: #fff;
             }
         }
+
+        .active {
+            background: #000000;
+            cursor: pointer;
+            a {
+                color: #fff;
+            }
+        }
     }
 
     a {
@@ -185,9 +206,15 @@
 
     .logo {
         padding: 50px 0px;
-        background: #000;
+        display: flex;
+        justify-content: center;
         h2 {
             color: #fff;
+            margin-top: 35px;
+            margin-left: 35px;
+        }
+        .img {
+            max-width: 100px !important;
         }
     }
     .nav-tabs {
@@ -195,5 +222,7 @@
             border:none;
         }
     }
-
+    .header__center {
+        background: #000;
+    }
 </style>

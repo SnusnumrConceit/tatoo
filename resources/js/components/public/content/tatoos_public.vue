@@ -10,7 +10,9 @@
                         <img :src="tatoo.url" alt="">
                     </div>
                     <div class="col-12">
-                        {{ tatoo.price }}
+                        {{ tatoo.price }} ₽
+                    </div>
+                    <div class="col-12">
                         <button class="btn btn-outline-primary" @click="showOrderModal(tatoo)">
                             Записаться
                         </button>
@@ -40,7 +42,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                {{ tmp_order.price }}
+                {{ tmp_order.price }} ₽
                 <button class="btn btn-outline-success" @click="makeOrder">
                     Записаться
                 </button>

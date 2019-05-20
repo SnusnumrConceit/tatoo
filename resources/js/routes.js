@@ -18,6 +18,7 @@ import Audit from './components/admin/audit/audit';
 import Contacts from './components/public/content/contacts';
 import PublicTatoos from './components/public/content/tatoos_public';
 import PublicMasters from './components/public/content/masters_public';
+import About from './components/public/content/about';
 
 import Login from './components/templates/admin/login';
 
@@ -149,5 +150,10 @@ export const routes = [
     name: 'login',
     path: '/login',
     component: Login
+  },
+  {
+    name: 'about',
+    path: '/about',
+    component: About
   }
 ];
