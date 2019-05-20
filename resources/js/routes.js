@@ -25,7 +25,7 @@ import Login from './components/templates/admin/login';
 const isAdmin = (to, from, next) => {
   let user = localStorage.getItem('user');
   user = (user !== undefined) ? JSON.parse(user) : '';
-  (user.role === 'admin') ? next() : next('/login');
+  (user && user.role === 'admin') ? next() : next('/login');
 };
 
 export const routes = [
