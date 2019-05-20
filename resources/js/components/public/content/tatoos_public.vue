@@ -138,5 +138,6 @@
 <style scoped>
     .col-12 {
         display: flex;
+        flex-wrap: wrap;
     }
 </style>
