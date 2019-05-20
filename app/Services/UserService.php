@@ -44,9 +44,9 @@ class UserService
                 'email'      => $request->email,
                 'birthday'   => $this->convertDate($request->birthday)
             ]);
-            $this->removeUserRoles($user->id);
-            $this->addRole($user->id, $request->role[0]['id']);
             $user->save();
+            $this->removeUserRoles($user->id);
+            $this->addRole($user->id, $request->role['id']);
             $this->makeLog($user, 1, 1);
             return response()->json([
                 'status' => 'success',
@@ -178,7 +178,7 @@ class UserService
             ]);
             $user->save();
             $this->removeUserRoles($user->id);
-            $this->addRole($user->id, $request->role[0]['id']);
+            $this->addRole($user->id, $request->role['id']);
             $this->makeLog($user, 2, 1);
             return response()->json([
                 'status' => 'success',
