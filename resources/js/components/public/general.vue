@@ -26,7 +26,7 @@
                     <div class="col-12">
                         <div class="logo">
                             <div class="img">
-                                <img src="/public/pictures/content/logo.png" alt="">
+                                <img src="/pictures/content/logo.png" alt="">
                             </div>
                             <h2 class="text-center text-info">
                                 Tatoo.ru
