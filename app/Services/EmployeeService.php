@@ -310,9 +310,10 @@ class EmployeeService
     public function publish($request)
     {
         try {
-            $employees = Employee::with(['appointment' => function ($q) {
-                $q->where('name', '=', 'Мастер');
-            }])->paginate(15);
+            $appointment = Appointment::where('name', 'Мастер')->first();
+            $employees = Employee::with(['appointment'])
+                ->where('appointment_id', $appointment->id)
+                ->paginate(15);
             return response()->json([
                 'employees' => new EmployeeCollection($employees)
             ], 200);

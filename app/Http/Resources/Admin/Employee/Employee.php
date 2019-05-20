@@ -20,7 +20,7 @@ class Employee extends JsonResource
             'name'          =>  $this->name,
             'birthday'      =>  $this->convertDate($this->birthday),
             'created_at'    =>  $this->convertDate($this->created_at),
-            'appointment'   =>  $this->appointment->name,
+            'appointment'   =>  empty($this->appointment->name) ? null : $this->appointment->name,
             'url'           =>  $this->setPath($this->url),
             'description'   =>  $this->description
         ];
