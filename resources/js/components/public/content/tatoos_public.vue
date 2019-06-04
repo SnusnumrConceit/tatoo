@@ -135,9 +135,12 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
     .col-12 {
         display: flex;
         flex-wrap: wrap;
+    }
+    .container-fluid {
+        min-height: calc(100vh - 26px);
     }
 </style>

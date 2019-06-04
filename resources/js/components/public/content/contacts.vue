@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col-12">
-            <h1>МЕСТО ДЛЯ ЯНДЕКС КАРТЫ</h1>
+            <h1><img src="/pictures/content/map.png" alt=""></h1>
         </div>
         <div class="col-3">
             <h3>Адрес: ул. Провиантская, 44</h3>

@@ -194,9 +194,6 @@
         color: #000;
         text-decoration: none;
     }
-    .container-content {
-        height: 97vh;
-    }
 
     .btn-link {
         color: #000;
@@ -224,5 +221,8 @@
     }
     .header__center {
         background: #000;
+    }
+    .container-content {
+        min-height: calc(100vh - 26px);
     }
 </style>
