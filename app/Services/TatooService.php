@@ -28,14 +28,17 @@ class TatooService
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Добавление татуировки
      *
      * @return \Illuminate\Http\Response
      */
     public function create($request)
     {
         try {
+            /** проверка параметров */
             $request->validated();
+
+            /** поиск и проверка на наличие дубля */
             $tatoo = Tatoo::where([
                 'name'        => $request->name,
                 'description' => $request->description,
@@ -43,15 +46,21 @@ class TatooService
             if ($tatoo) {
                 throw new \Exception('Такая татуировка есть в системе');
             }
+
+            /** перемещение загруженного эскиза */
             $this->image->move($request->url, $request->destination);
+            /** инициализация возможности "общения" с таблицей Tatoos через модель */
             $tatoo = new Tatoo();
+            /** заполнение промежуточными данными */
             $tatoo->fill([
                 'name'        => $request->name,
                 'description' => $request->description,
                 'price'       => $request->price,
                 'url'         => $request->destination
             ]);
+            /** сохранение */
             $tatoo->save();
+            /** возврат успешного статуса и сообщения */
             $this->makeLog($tatoo, 4, 1);
             return response()->json([
                 'status' => 'success',
@@ -66,7 +75,7 @@ class TatooService
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Хранилище татуировок
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -74,6 +83,7 @@ class TatooService
     public function store($request)
     {
         try {
+            /** получение по 15 татуировок на странице */
             $tatoos = Tatoo::paginate(15);
             return response()->json([
                 'tatoos' => new TatooCollection($tatoos)
@@ -87,7 +97,7 @@ class TatooService
     }
 
     /***
-     * Search by keyword and filter data in storage
+     * Поиск и сортировка по татуировкам
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -95,17 +105,26 @@ class TatooService
     public function search($request)
     {
         try {
+            /** инициализация возможности "общения" с таблицей Tatoos через модель */
             $tatoos = new Tatoo();
+
+            /** при наличии параметра keyword */
             if (isset($request->keyword)) {
+                /** выполняется поиск по названию */
                 $tatoos = $tatoos->where('name', 'LIKE', $request->keyword.'%');
             }
+
+            /** при наличии параметра filter */
             if (isset($request->filter)) {
+                /** конвертация из JSON */
                 $filter = json_decode($request->filter);
 
+                /** выполняется сортировка по полю и типу */
                 if (!empty($filter->name) && !empty($filter->type)) {
                     $tatoos = $tatoos->orderBy($filter->name, $filter->type);
                 }
             }
+            /** получение по 10 татуировок на страницу */
             $tatoos = $tatoos->paginate(10);
             return response()->json([
                 'tatoos' => new TatooCollection($tatoos)
@@ -119,7 +138,7 @@ class TatooService
     }
 
     /**
-     * Display the info with smth relations.
+     * Получение информации о татуировке
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -127,6 +146,7 @@ class TatooService
     public function info($id)
     {
         try {
+            /** поиск татуировки с мастерами по идентификатору */
             $tatoo = Tatoo::with('masters')->findOrFail($id);
             return response()->json([
                 'tatoo' => new TatooInfo($tatoo)
@@ -140,7 +160,7 @@ class TatooService
     }
 
     /**
-     * Show the form info for editing.
+     * Получение татуировки для редактирования
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -148,6 +168,7 @@ class TatooService
     public function edit($id)
     {
         try {
+            /** поиск татуировки по идентификатору */
             $tatoo = Tatoo::findOrFail($id);
             return response()->json([
                 'tatoo' => $tatoo
@@ -161,7 +182,7 @@ class TatooService
     }
 
     /**
-     * Update the specified resource in storage.
+     * Обновление информации о татуировке
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -170,20 +191,29 @@ class TatooService
     public function update($request, $id)
     {
         try {
+            /** проверка входных параметров */
             $request->validated();
+
+            /** если указан параметр destination */
             if (! empty($request->destination)) {
+                /** переместить картинку по этому пути */
                 $this->image->move($request->url, $request->destination);
                 $url = $request->destination;
             } else {
+                /** переместить по url */
                 $url = $request->url;
             }
+
+            /** поиск татуировки по идентификатору */
             $tatoo = Tatoo::findOrFail($id);
+            /** заполнение промежуточными данными */
             $tatoo->fill([
                 'name'        => $request->name,
                 'description' => $request->description,
                 'price'       => $request->price,
                 'url'         => $url
             ]);
+            /** сохранение */
             $tatoo->save();
             $this->makeLog($tatoo, 5, 1);
             return response()->json([
@@ -222,16 +252,33 @@ class TatooService
         }
     }
 
+    /***
+     * Экспорт татуировок
+     *
+     * @return TatooExport
+     */
     public function export()
     {
         return new TatooExport();
     }
 
+    /***
+     * Конвертация даты в формат Y-m-d
+     *
+     * @param $date
+     * @return string
+     */
     public function convertDate($date)
     {
         return Carbon::parse($date)->format('Y-m-d');
     }
 
+    /***
+     * Получение списка мастеров для татуировок
+     *
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getTatooMasters($id)
     {
         try {

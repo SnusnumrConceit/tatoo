@@ -23,22 +23,30 @@ use App\User;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 
+/** функциональность заказов **/
 class OrderService
 {
     /**
-     * Show the form for creating a new resource.
+     * добавление товара
      *
      * @return \Illuminate\Http\Response
      */
     public function create($request)
     {
         try {
+            /** валидация входных параметров */
             $request->validated();
+            /** инициализация возможности "общения" с таблицей Orders через модель */
             $order = new Order();
+            /** конвертация времени записи в формат Дата и время (datetime) */
             $order->note_date = $this->convertDate($request->note_date, $request->note_time);
+
+            /** проверка на соответствие даты необходимому шаблону: d.m.Y HH:mm:ss**/
             if (! $this->validateNoteDate($order->note_date)) {
                 throw new \Exception('Проверьте правильность указанной даты');
             }
+
+            /** заполнение модели предварительными данными */
             $order->fill([
                 'tatoo_id'  =>  $request->tatoo_id,
                 'user_id'   =>  $request->user_id,
@@ -46,15 +54,20 @@ class OrderService
                 'master_id' =>  $request->master,
                 'note_end'  =>  Carbon::parse($order->note_date)->addHours(4)
             ]);
+            /** сохранение заказа **/
             $order->save();
+            /** формирование информации по заказу для письма */
             $mail_order = Order::with(['customer', 'tatoo'])->findOrFail($order->id);
             $this->makeLog($order, 13 ,1);
+            /** генерация события для отправки письма */
             event(new OrderCompleted($mail_order));
+            /** возвращение успешного статуса и сообщения */
             return response()->json([
                 'status'  =>  'success',
-                'msg'     =>  'Заказ успешно обновлён'
+                'msg'     =>  'Заказ успешно добавлен'
             ], 200);
         } catch (\Exception $error) {
+            /** в случае исключения возвращается ошибка с сообщением */
             return response()->json([
                 'status' => 'error',
                 'msg'    => $error->getMessage()
@@ -63,7 +76,7 @@ class OrderService
     }
 
     /**
-     * Store a newly created resource in storage.
+     * список всех заказов
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -71,11 +84,14 @@ class OrderService
     public function store($request)
     {
         try {
+            /** получение по 25 заказов постранично с пользователями и татуировками */
             $orders = Order::with(['customer', 'tatoo'])->paginate(25);
+            /** возвращение найденных заказов */
             return response()->json([
                 'orders' => new OrderCollection($orders)
             ], 200);
         } catch (\Exception $error) {
+            /** в случае исключения возвращается ошибка с сообщением */
             return response()->json([
                 'status' => 'error',
                 'msg'    => $error->getMessage()
@@ -86,14 +102,23 @@ class OrderService
     public function search($request)
     {
         try {
+            /** инициализация возможности "общения" с таблицей Orders через модель */
             $query = new Order();
+
+            /** если в запросе параметр keyword заполнен */
             if (isset($request->keyword)) {
+                /** то производится поиск по названию татуировки */
                 $query = $query->searchByTatoo($request->keyword);
             }
+
+            /** если в запросе параметр filter заполнен */
             if (isset($request->filter)) {
+                /** конвертация из JSON */
                 $filter = json_decode($request->filter);
 
+                /** если параметры name и type заполнены */
                 if (!empty($filter->name) && !empty($filter->type)) {
+                    /** формируется запрос сортировки относительно поля таблиц */
                     switch ($filter->name) {
                         case 'tatoo': $query = $query->sortByTatoo($filter->type); break;
                         case 'name': $query = $query->sortByCustomer($filter->type); break;
@@ -101,11 +126,15 @@ class OrderService
                     }
                 }
             }
+
+            /** получение по 25 найденных заказов постранично с пользователями и татуировками */
             $orders = $query->with(['customer', 'tatoo'])->paginate(25);
+            /** возвращение найденных заказов */
             return response()->json([
                 'orders' => new OrderCollection($orders)
             ], 200);
         } catch (\Exception $error) {
+            /** в случае исключения возвращается ошибка с сообщением */
             return response()->json([
                 'status' => 'error',
                 'msg' => $error->getMessage()
@@ -114,7 +143,7 @@ class OrderService
     }
 
     /**
-     * Display the specified resource.
+     * Дополнительные данные для формы
      *
      * @param  \App\Model\Order  $order
      * @return \Illuminate\Http\Response
@@ -122,13 +151,17 @@ class OrderService
     public function extends()
     {
         try {
+            /** получение всех пользователей */
             $users = User::all();
+            /** получение всех татуировок */
             $tatoos = Tatoo::all();
+            /** возвращение найденных данных */
             return response()->json([
                 'clients'  => new OrderCustomerExtendsCollection($users),
                 'tatoos' => new OrderTatooExtendsCollection($tatoos)
             ]);
         } catch (\Exception $error) {
+            /** в случае исключения возвращается ошибка с сообщением */
             return response()->json([
                 'status' => 'error',
                 'msg'    => $error->getMessage()
@@ -136,14 +169,23 @@ class OrderService
         }
     }
 
+    /***
+     * информация о заказе
+     *
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function info($id)
     {
         try {
+            /** поиск заказа с покупателем и тату по идентификатору */
             $order = Order::with(['customer', 'tatoo'])->findOrFail($id);
+            /** возвращение найденного заказа */
             return response()->json([
                 'order' => new OrderInfo($order)
             ], 200);
         } catch (\Exception $error) {
+            /** в случае исключения возвращается ошибка с сообщением */
             return response()->json([
                 'status' => 'error',
                 'msg'    => $error->getMessage()
@@ -152,7 +194,7 @@ class OrderService
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Получение заказа на редактирование
      *
      * @param  \App\Model\Order  $order
      * @return \Illuminate\Http\Response
@@ -160,12 +202,14 @@ class OrderService
     public function edit($id)
     {
         try {
+            /** поиск заказа с покупателем, тату и мастером по идентификатору */
             $order = Order::with(['tatoo', 'customer', 'master'])->findOrFail($id);
+            /** возвращение найденного заказа */
             return response()->json([
-//                'order' => $order
                 'order' => new OrderForm($order)
             ], 200);
         } catch (\Exception $error) {
+            /** в случае исключения возвращается ошибка с сообщением */
             return response()->json([
                 'status' => 'error',
                 'msg'    => $error->getMessage()
@@ -174,7 +218,7 @@ class OrderService
     }
 
     /**
-     * Update the specified resource in storage.
+     * Обновление заказа
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Model\Order  $order
@@ -183,8 +227,11 @@ class OrderService
     public function update($request, $id)
     {
         try {
+            /** проверка входных параметров */
             $request->validated();
+            /** поиск заказа по идентификатору */
             $order = Order::findOrFail($id);
+            /** заполнение модели предварительными данными */
             $order->fill([
                 'tatoo_id'  =>  $request->tatoo_id,
                 'user_id'   =>  $request->user_id,
@@ -192,13 +239,16 @@ class OrderService
                 'note_date' =>  $this->convertDate($request->note_date, $request->note_time),
                 'master_id' =>  $request->master
             ]);
+            /** сохранение в таблице */
             $order->save();
+            /** возвращение статуса и сообщения об успешности */
             $this->makeLog($order, 14, 1);
             return response()->json([
                 'status'  =>  'success',
                 'msg'     =>  'Заказ успешно обновлён'
             ], 200);
         } catch (\Exception $error) {
+            /** в случае исключения возвращается ошибка с сообщением */
             return response()->json([
                 'status' => 'error',
                 'msg'    => $error->getMessage()
@@ -207,7 +257,7 @@ class OrderService
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Удаление заказа
      *
      * @param  \App\Model\Order  $order
      * @return \Illuminate\Http\Response
@@ -223,6 +273,7 @@ class OrderService
                 'msg' => 'Заказ успешно удалён'
             ], 200);
         } catch (\Exception $error) {
+            /** в случае исключения возвращается ошибка с сообщением */
             return response()->json([
                 'status' => 'error',
                 'msg'    => $error->getMessage()
@@ -230,27 +281,35 @@ class OrderService
         }
     }
 
+    /** экспорт в Excel */
     public function export()
     {
         return new OrderExport();
     }
 
+    /** конвертация в нужный формат */
     public function convertDate($date, $time)
     {
         return Carbon::parse($date)->addDays(1)->format('Y-m-d') . ' '. $time['HH'].':'.$time['mm'];
     }
 
+    /** добавление заказа из пользовательского интерфейса */
     public function publish($request)
     {
         try {
 //            Validator::make([]);
+            /** конвертация даты */
             $date = $this->convertDate($request->note_date, $request->note_time);
+
+            /** проверка корреткности даты */
             if  (! $this->validateNoteDate($date)) {
                 throw new \Exception('Проверьте корректность даты');
             }
             if (empty($request->master['id'])) {
                 throw new \Exception('Вы не указали мастера');
             }
+
+            /** заполнение модели предварительными данными */
             $order = (new Order)->fill([
                 'tatoo_id'  => $request->tatoo,
                 'user_id'   => auth()->id(),
@@ -259,8 +318,11 @@ class OrderService
                 'note_date' => $date,
                 'note_end'  =>  Carbon::parse($date)->addHours(4)
             ]);
+            /** сохранение данных в таблице */
             $order->save();
+            /** поиск заказа для формирования заказа для email */
             $mail_order = Order::with(['customer', 'tatoo'])->findOrFail($order->id);
+            /** отправка письма */
             event(new OrderCompleted($mail_order));
             return response()->json([
                 'status' => 'success',
@@ -274,6 +336,7 @@ class OrderService
         }
     }
 
+    /** проверка корректности даты */
     public function validateNoteDate($date)
     {
         if ($date < Carbon::now()) {

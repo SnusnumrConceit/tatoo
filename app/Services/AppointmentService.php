@@ -24,7 +24,10 @@ class AppointmentService
     public function create($request)
     {
         try {
+            /** инициализация возможности "общения" с таблицей Appointments через модель */
             $appointment = new Appointment();
+
+            /** проверка по имени на наличие дублирования */
             if (! empty($request->appointment)) {
                 $dublicate = Appointment::where('name', $request->appointment)->count();
                 if ($dublicate) {
@@ -33,11 +36,15 @@ class AppointmentService
             } else {
                 throw new \Exception('Вы не указали наименование должности');
             }
+
+            /** заполнение промежуточными данными */
             $appointment->fill([
                 'name' => $request->appointment
             ]);
+            /** сохранение */
             $appointment->save();
             $this->makeLog($appointment, 10, 1);
+            /** возвращение успешного статуса и сообщения */
             return response()->json([
                 'status' => 'success',
                 'msg'    => 'Должность успешно добавлена'
@@ -51,7 +58,7 @@ class AppointmentService
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Хранилище должностей
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -71,15 +78,28 @@ class AppointmentService
         }
     }
 
+    /***
+     * Поиск и сортировка должностей
+     *
+     * @param $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function search($request)
     {
         try {
+            /** инициализация возможности "общения" с таблицей Appointments через модель */
             $query = new Appointment();
+
+            /** если параметр keyword заполненный, то происходит поиск по имени */
             if (! empty($request->keyword)) {
                 $query = $query->where('name', 'LIKE', '%'.$request->keyword.'%');
             }
+
+            /** если параметр filter заполнен */
             if (! empty($request->filter)) {
+                /** конвертация из JSON */
                 $filter = json_decode($request->filter);
+                /** сортировка по названию и типу */
                 $query = $query->orderBy($filter->name, $filter->type);
             }
             $appointments = $query->with('employee')->paginate(25);
@@ -94,9 +114,8 @@ class AppointmentService
         }
     }
 
-
     /**
-     * Show the form for editing the specified resource.
+     * Получение должности на редактирование
      *
      * @param  \App\Models\Appointment  $appointment
      * @return \Illuminate\Http\Response
@@ -104,7 +123,9 @@ class AppointmentService
     public function edit(int $id)
     {
         try {
+            /** поиск должности по идентификатору */
             $appointment = Appointment::findOrFail($id);
+            /** возврат найденной должности */
             return response()->json([
                 'appointment' => $appointment
             ], 200);
@@ -126,7 +147,9 @@ class AppointmentService
     public function update($request, int $id)
     {
         try {
+            /** проверка на наличие параметра */
             if (! empty($request->appointment)) {
+                /** поиск на наличие дубликата */
                 $dublicate = Appointment::where('name', $request->appointment)->count();
                 if ($dublicate == 1) {
                     throw new \Exception('Данная должность внесена в систему');
@@ -134,12 +157,17 @@ class AppointmentService
             } else {
                 throw new \Exception('Вы не указали наименование должности');
             }
+
+            /** поиск должности по идентификатору */
             $appointment = Appointment::findOrFail($id);
+            /** заполнение промежуточными данными */
             $appointment->fill([
                 'name' => $request->appointment
             ]);
+            /** сохранение */
             $appointment->save();
             $this->makeLog($appointment, 11, 1);
+            /** возвращение успешного статуса и сообщения */
             return response()->json([
                 'status' => 'success',
                 'msg'    => 'Должность успешно обновлена'
@@ -176,6 +204,11 @@ class AppointmentService
         }
     }
 
+    /**
+     * Экспорт должностей в Excel
+     *
+     * @return AppointmentExport
+     */
     public function export()
     {
         return new AppointmentExport();

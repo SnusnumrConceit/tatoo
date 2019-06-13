@@ -30,7 +30,7 @@ class EmployeeService
     }
 
     /***
-     * Export masters
+     * Экспорт работников
      *
      * @return MasterExport
      */
@@ -40,18 +40,23 @@ class EmployeeService
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Добавление работника
      *
      * @return \Illuminate\Http\Response
      */
     public function create($request)
     {
         try {
+            /** проверка на наличие конечного пути перемещения фотографии */
             if  (empty($request->destination)) {
                 throw new \Exception('Не удалось передать конечную директорию');
             }
+
+            /** перемещение фотографии */
             $this->image->move($request->url, $request->destination);
+            /** инициализация возможности "общения" с таблицей Employees через модель */
             $employee = new Employee();
+            /** заполнение промежуточными данными */
             $employee->fill([
                 'name'           => $request->name,
                 'description'    => $request->description,
@@ -59,11 +64,15 @@ class EmployeeService
                 'birthday'       => $this->convertDate($request->birthday),
                 'url'            => $request->destination
             ]);
+            /** сохранение */
             $employee->save();
             $this->makeLog($employee, 7, 1);
+            /** если параметр tatoos не пустой */
             if (! empty($request->tatoos)) {
+                /** обновление татуировок */
                 $this->addTatoos($employee->id, $request->tatoos);
             }
+            /** возвращение успешного сообщения и статуса */
             return response()->json([
                 'status' => 'success',
                 'msg' => 'Работник успешно добавлен в систему!'
@@ -77,7 +86,7 @@ class EmployeeService
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Хранилище должностей
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -85,11 +94,9 @@ class EmployeeService
     public function store($request)
     {
         try {
-//            $employees = (isset($request->page))
-//                ? Employee::with('appointment')->paginate(15)
-//                : Employee::with('appointment')->all();
-
+            /** получение работников по 15 на странице */
             $employees = Employee::with('appointment')->paginate(15);
+            /** возврат полученных работников */
             return response()->json([
                 'employees' => new EmployeeCollection($employees)
             ], 200);
@@ -101,10 +108,17 @@ class EmployeeService
         }
     }
 
+    /***
+     * Дополнительные данные для формы
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function extends()
     {
         try {
+            /** получение списка должностей */
             $appointments = Appointment::all();
+            /** получение списка татуировок */
             $tatoos = Tatoo::all();
             return response()->json([
                 'appointments' => $appointments,
@@ -119,7 +133,7 @@ class EmployeeService
     }
 
     /***
-     * Search by keyword and filter data in storage
+     * Поиск и сортировка работников
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -127,21 +141,33 @@ class EmployeeService
     public function search($request)
     {
         try {
+            /** инициализация возможности "общения" с таблицей Employees через модель */
             $employees = new Employee();
+
+            /** если параметр keyword задан */
             if (isset($request->keyword)) {
+                /** поиск по имени */
                 $employees = $employees->where('name', 'LIKE', $request->keyword.'%');
             }
+
+            /** если параметр filter задан */
             if (isset($request->filter)) {
+                /** конвертация из JSON */
                 $filter = json_decode($request->filter);
 
+                /** проверка на наличие параметров name и type */
                 if (!empty($filter->name) && !empty($filter->type)) {
+                    /** если сортировка по должности */
                     if ($filter->name === 'appointment') {
+                        /** происходит кастомная сортировка */
                         $employees = $employees->sortByAppointment($filter->type);
                     } else {
+                        /** в противном случае по стандарту */
                         $employees = $employees->orderBy($filter->name, $filter->type);
                     }
                 }
             }
+            /** вывод по 10 должностей на страницу */
             $employees = $employees->with('appointment')->paginate(10);
             return response()->json([
                 'employees' => new EmployeeCollection($employees)
@@ -155,7 +181,7 @@ class EmployeeService
     }
 
     /**
-     * Display the info with smth relations.
+     * Получение информации о работнике
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -163,6 +189,7 @@ class EmployeeService
     public function info($id)
     {
         try {
+            /** поиск работника с должностью и татуировками по идентификатору */
             $employee = Employee::with(['appointment', 'tatoos'])->findOrFail($id);
             return response()->json([
                 'employee' => new EmployeeInfo($employee)
@@ -176,7 +203,7 @@ class EmployeeService
     }
 
     /**
-     * Show the form info for editing.
+     * Получение работника для редактирования
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -184,6 +211,7 @@ class EmployeeService
     public function edit($id)
     {
         try {
+            /** поиск работника с должностью и татуировками по идентификатору */
             $employee = Employee::with(['appointment', 'tatoos'])->findOrFail($id);
             return response()->json([
                 'employee' => $employee
@@ -197,7 +225,7 @@ class EmployeeService
     }
 
     /**
-     * Update the specified resource in storage.
+     * Обновление информации о работнике
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -206,14 +234,19 @@ class EmployeeService
     public function update($request, $id)
     {
         try {
+            /** проверка на наличие конечного пути перемещения фотографии */
             if (! empty($request->destination)) {
                 $this->image->move($request->url, $request->destination);
                 $url = $request->destination;
             } else {
                 $url = $request->url;
             }
+
+            /** перемещение фотографии */
             $this->image->move($request->url, $request->destination);
+            /** поиск работника по идентификатору */
             $employee = Employee::findOrFail($id);
+            /** заполнение промежуточными данными */
             $employee->fill([
                 'name' => $request->name,
                 'description' => $request->description,
@@ -221,10 +254,14 @@ class EmployeeService
                 'birthday' => $this->convertDate($request->birthday),
                 'url' => $url
             ]);
+            /** сохранение */
             $employee->save();
             $this->makeLog($employee, 8, 1);
+            /** если параметр tatoos задан */
             if (! empty($request->tatoos)) {
+                /** удаление текущего списка татуировок у работника*/
                 $this->removeTatoos($employee->id);
+                /** добавление нового списка татуировок у работника*/
                 $this->addTatoos($employee->id, $request->tatoos);
             }
             return response()->json([
@@ -240,7 +277,7 @@ class EmployeeService
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Удаление работника
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -248,8 +285,10 @@ class EmployeeService
     public function destroy($id)
     {
         try {
+            /** поиск работника по идентификатору */
             $employee = Employee::findOrFail($id);
             $this->makeLog($employee, 9, 1);
+            /** удаление */
             $employee->delete();
             return response()->json([
                 'status' => 'success',
@@ -263,6 +302,12 @@ class EmployeeService
         }
     }
 
+    /***
+     * Добавление татуировок работника
+     *
+     * @param $id
+     * @param $tatoos
+     */
     public function addTatoos($id, $tatoos)
     {
         $ids = [];
@@ -279,16 +324,23 @@ class EmployeeService
         }
     }
 
+    /***
+     * Удаление татуировок работника
+     *
+     * @param $id
+     */
     public function removeTatoos($id)
     {
         MasterTatoo::where('employee_id', $id)->delete();
     }
 
+    /** конвертация даты в формат Y-m-d */
     public function convertDate($date)
     {
         return Carbon::parse($date)->format('Y-m-d');
     }
 
+    /** получение списка татуировок пользователя */
     public function getTatoos($id)
     {
         try {
