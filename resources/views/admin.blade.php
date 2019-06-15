@@ -66,7 +66,7 @@
             margin-bottom: 30px;
         }
         .header-desktop {
-            z-index: 0 !important;
+            z-index: 3 !important;
         }
     </style>
 </head>
