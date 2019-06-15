@@ -65,6 +65,9 @@
         .m-b-md {
             margin-bottom: 30px;
         }
+        .header-desktop {
+            z-index: 0 !important;
+        }
     </style>
 </head>
 <body>
