@@ -165,7 +165,6 @@ return [
         /*
          * Package Service Providers...
          */
-        Kodeine\Acl\AclServiceProvider::class,
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         /*
