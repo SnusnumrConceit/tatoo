@@ -12,12 +12,13 @@ use App\Http\Requests\Admin\Appointment\DeleteAppointment;
 
 use App\Http\Resources\Admin\Appointment\DetailAppointment;
 use App\Http\Resources\Admin\Appointment\AppointmentCollection;
+use Illuminate\Http\JsonResponse;
 
 class AppointmentController extends Controller
 {
 	public function __construct()
 	{
-		$this->authorizeResource('App\Appointment');
+		$this->authorizeResource('App\Models\Appointment');
 	}
 	
 	/**
@@ -25,7 +26,7 @@ class AppointmentController extends Controller
 	 *
 	 * @param IndexAppointment $request
 	 *
-	 * @return AppointmentCollection
+	 * @return JsonResponse
 	 *
 	 * @throws \Illuminate\Auth\Access\AuthorizationException
 	 */
@@ -47,13 +48,15 @@ class AppointmentController extends Controller
 		
 		$appointments = $appointments->paginate();
 		
-		return new AppointmentCollection($appointments);
+		return (new AppointmentCollection($appointments))
+			->response();
 	}
 	
 	/**
 	 * Store a newly created appointment in storage
 	 *
 	 * @param StoreAppointment $request
+	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function store(StoreAppointment $request)
@@ -69,11 +72,13 @@ class AppointmentController extends Controller
 	 * Display the appointment resource.
 	 *
 	 * @param Appointment $appointment
-	 * @return DetailAppointment
+	 *
+	 * @return JsonResponse
 	 */
 	public function show(Appointment $appointment)
 	{
-		return new DetailAppointment($appointment);
+		return (new DetailAppointment($appointment))
+			->response();
 	}
 
 	/**
@@ -81,6 +86,7 @@ class AppointmentController extends Controller
 	 *
 	 * @param  UpdateAppointment  $request
 	 * @param  Appointment  $appointment
+	 *
 	 * @return \Illuminate\Http\Response
 	 */
 	public function update(UpdateAppointment $request, Appointment $appointment)
@@ -97,7 +103,9 @@ class AppointmentController extends Controller
 	 *
 	 * @param DeleteAppointment $request
 	 * @param Appointment $appointment
+	 *
 	 * @return \Illuminate\Http\JsonResponse
+	 *
 	 * @throws \Exception
 	 */
 	public function destroy(DeleteAppointment $request, Appointment $appointment)
