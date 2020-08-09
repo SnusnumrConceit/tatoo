@@ -6,8 +6,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class DetailAppointment extends JsonResource
 {
-	public static $wrap = '';
-	
 	/**
 	 * Transform the resource into an array.
 	 *
@@ -22,5 +20,10 @@ class DetailAppointment extends JsonResource
 				'name' => $this->name
 			]
 		];
+	}
+	
+	public function withResponse($request, $response)
+	{
+		$response->setStatusCode(200);
 	}
 }
