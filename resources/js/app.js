@@ -24,19 +24,14 @@ import VModal from 'vue-js-modal'
 Vue.use(VModal);
 
 /** VueRouter Configuration **/
-import VueRouter from 'vue-router';
-Vue.use(VueRouter);
-import { routes } from "./routes";
-const router = new VueRouter({ routes });
+import router from './router.js'
 
 /** Vue-select **/
 import vSelect from 'vue-select'
-
-Vue.component('v-select', vSelect)
-
-import store from './store/index';
+Vue.component('v-select', vSelect);
 
 /** Vuex Configuration **/
+import store from './store/index';
 import Vuex from 'vuex';
 Vue.use(Vuex);
 

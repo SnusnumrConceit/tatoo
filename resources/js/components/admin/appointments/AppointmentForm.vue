@@ -8,11 +8,13 @@
                        class="form-control">
             </div>
             <div class="form-group col-4">
-                <button class="btn btn-outline-success" v-if="$route.params.id" @click="save">
-                    Сохранить
-                </button>
-                <button class="btn btn-outline-success" @click="save" v-else>
-                    Добавить
+                <button class="btn btn-outline-success" @click="save">
+                    <span v-if="$route.params.id">
+						Сохранить
+					</span>
+					<span v-else>
+						Добавить
+					</span>
                 </button>
                 <button class="btn btn-outline-secondary" @click="$router.push({ name: 'appointments' })">
                     Отмена
