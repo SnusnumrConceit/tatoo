@@ -98,22 +98,8 @@ Route::group([
         ->where('id', '[0-9]+');
 });
 
-Route::group([
-    'prefix' => 'appointments'
-], function () {
-    Route::get('/', 'AppointmentController@store');
-    Route::get('/search', 'AppointmentController@search');
-    Route::get('/edit/{id}', 'AppointmentController@edit')
-        ->where('id', '[0-9]+');
-    Route::get('/info/{id}', 'AppointmentController@info')
-        ->where('id', '[0-9]+');
-    Route::post('/create', 'AppointmentController@create');
-    Route::post('/update/{id}', 'AppointmentController@update')
-        ->where('id', '[0-9]+');
-    Route::post('/remove/{id}', 'AppointmentController@destroy')
-        ->where('id', '[0-9]+');
-    Route::get('/export', 'AppointmentController@export');
-});
+Route::get('/export', 'AppointmentController@export');
+Route::resource('/appointments', 'AppointmentController');
 
 Route::group([
     'prefix' => 'image'
