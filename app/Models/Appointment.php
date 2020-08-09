@@ -6,12 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
-    protected $fillable = ['name'];
+	protected $fillable = ['name'];
 
-    public $timestamps = false;
-
-    public function employee()
-    {
-        return $this->belongsTo(Employee::class, 'id', 'appointment_id');
-    }
+	public $timestamps = false;
+	
+	/**
+	 * Employees O-2-M relation
+	 *
+	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
+	 */
+	public function employees()
+	{
+		return $this->hasMany(Employee::class, 'appointment_id', 'id');
+	}
+	
+	/**
+	 * Check existing employees
+	 *
+	 * @return bool
+	 */
+	public function hasEmployees()
+	{
+		return $this->employees()->exists();
+	}
 }
