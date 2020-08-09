@@ -5,7 +5,7 @@ namespace App\Http\Requests\Admin\Appointment;
 use Illuminate\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
-class DeleteAppointment extends FormRequest
+class DestroyAppointment extends FormRequest
 {
 	/**
 	 * Determine if the user is authorized to make this request.

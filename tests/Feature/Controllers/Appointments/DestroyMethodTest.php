@@ -6,7 +6,7 @@ use App\Models\Appointment;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\AppointmentController;
 use Tests\Feature\Controllers\BaseControllerTest;
-use App\Http\Requests\Admin\Appointment\DeleteAppointment;
+use App\Http\Requests\Admin\Appointment\DestroyAppointment;
 
 class DestroyMethodTest extends BaseControllerTest
 {
@@ -19,7 +19,7 @@ class DestroyMethodTest extends BaseControllerTest
 		$this->deletingAppointment = factory(Appointment::class)->create();
 		$this->data = factory(Appointment::class)->raw();
 		$this->controllerName = AppointmentController::class;
-		$this->formRequestName = DeleteAppointment::class;
+		$this->formRequestName = DestroyAppointment::class;
 		$this->actionName = 'destroy';
 	}
 	

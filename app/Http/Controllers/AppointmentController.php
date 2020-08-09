@@ -8,7 +8,7 @@ use App\Exports\AppointmentExport;
 use App\Http\Requests\Admin\Appointment\IndexAppointment;
 use App\Http\Requests\Admin\Appointment\StoreAppointment;
 use App\Http\Requests\Admin\Appointment\UpdateAppointment;
-use App\Http\Requests\Admin\Appointment\DeleteAppointment;
+use App\Http\Requests\Admin\Appointment\DestroyAppointment;
 
 use App\Http\Resources\Admin\Appointment\DetailAppointment;
 use App\Http\Resources\Admin\Appointment\AppointmentCollection;
@@ -108,7 +108,7 @@ class AppointmentController extends Controller
 	 *
 	 * @throws \Exception
 	 */
-	public function destroy(DeleteAppointment $request, Appointment $appointment)
+	public function destroy(DestroyAppointment $request, Appointment $appointment)
 	{
 		$appointment->delete();
 		
