@@ -15,18 +15,8 @@ class UserVuex extends JsonResource
     public function toArray($request)
     {
         return [
-            'full_name' => $this->last_name.' '.$this->first_name,
-            'role' => $this->role[0]->slug,
-            'csrf_token' => $this->getCSRF($this->role[0]->slug),
+            'full_name' => $this->full_name,
+            'role' => $this->role_name
         ];
-    }
-
-    public function getCSRF($slug)
-    {
-        switch ($slug) {
-            case 'superadmin': return csrf_token(); break;
-            case 'admin': return csrf_token(); break;
-            default: return ''; break;
-        }
     }
 }
