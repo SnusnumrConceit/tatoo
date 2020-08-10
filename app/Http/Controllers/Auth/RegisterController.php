@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Requests\Auth\LoginRequest;
-use App\Http\Requests\Auth\RegistrationRequest;
-use App\Services\UserService;
 use App\User;
-use App\Http\Controllers\Controller;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use App\Services\AuthService;
+use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use App\Http\Requests\Auth\RegistrationRequest;
 
 class RegisterController extends Controller
 {
@@ -33,60 +30,53 @@ class RegisterController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
-    public $user;
+    
+    protected $authService;
+    
     /**
      * Create a new controller instance.
      *
+     * @param AuthService $authService
+     *
      * @return void
      */
-    public function __construct(UserService $user)
+    public function __construct(AuthService $authService)
     {
-        $this->middleware('guest');
-        $this->user = $user;
+        $this->authService = $authService;
     }
-
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-//    protected function validator(array $data)
-//    {
-//        return Validator::make($data, [
-//            'name' => ['required', 'string', 'max:255'],
-//            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-//            'password' => ['required', 'string', 'min:8', 'confirmed'],
-//        ]);
-//    }
-
+    
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
-     * @return \App\User
+     * @param array $data
+     *
+     * @return mixed
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        $data['birthday'] = Carbon::parse($data['birthday'])->format('Y-m-d');
+        $data['password'] = bcrypt($data['password']);
+        
+        return User::create($data);
     }
-
+    
+    /**
+     * Registry user in the system
+     *
+     * @param RegistrationRequest $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @throws \Exception
+     */
     public function registry(RegistrationRequest $request)
     {
-        $request->validated();
-        $user = User::create([
-            'last_name'  => $request->last_name,
-            'first_name' => $request->first_name,
-            'birthday'   => Carbon::parse($request->birthday)->format('Y-m-d'),
-            'email'      => $request->email,
-            'password'   => Hash::make($request->password)
-        ]);
-        $this->user->removeUserRoles($user->id);
-        $this->user->addRole($user->id, 1);
-        return (new LoginController())->login(LoginRequest::createFrom($request));
+        $user = $this->create($request->validated());
+    
+        $this->authService->JWTAuthorize($credentials = $request->only('email', 'password'));
+    
+        auth()->attempt($credentials, true);
+        
+        return $this->authService->authorizationResponse($user);
     }
 }
