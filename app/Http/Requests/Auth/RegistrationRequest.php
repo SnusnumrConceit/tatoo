@@ -27,25 +27,11 @@ class RegistrationRequest extends FormRequest
     public function rules()
     {
         return [
-            'email'         =>  'required|email|min:10|max:60',
-            'password'      =>  'required|min:8|max:50',
-            'first_name'    =>  'required|min:3|max:20',
-            'last_name'    =>   'required|min:2|max:30',
+            'email'         =>  'required|email|between:10,60',
+            'password'      =>  'required|between:8,50',
+            'first_name'    =>  'required|between:3,20',
+            'last_name'     =>  'required|between:2,30',
             'birthday'      =>  'required|date',
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        throw new ValidationException($validator, response()->json([
-            'status'    =>  'error',
-            'errors'    =>  $validator->errors(),
-            'msg'       =>  'Проверьте корректность данных'
-        ]));
-    }
-
-    public function failedAuthorization()
-    {
-        throw new AuthorizationException('Вы не авторизованы', 403);
     }
 }

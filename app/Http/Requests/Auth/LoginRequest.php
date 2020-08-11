@@ -15,7 +15,6 @@ class LoginRequest extends FormRequest
      */
     public function authorize()
     {
-        /*return auth()->user()->hasRole('superadmin|admin');*/
         return true;
     }
 
@@ -27,22 +26,8 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'email'     =>  'required|email|min:10|max:60',
-            'password'  =>  'required|min:8|max:50'
+            'email'     =>  'required|email|between:10,60',
+            'password'  =>  'required|between:8,50'
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        return response()->json([
-            'status'    =>  'error',
-            'errors'    =>  $validator->errors(),
-            'msg'       =>  'Проверьте корректность данных'
-        ], 200);
-    }
-
-    public function failedAuthorization()
-    {
-        throw new AuthorizationException('Вы не авторизованы', 403);
     }
 }
