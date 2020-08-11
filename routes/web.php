@@ -19,6 +19,8 @@ Route::get('/', function () {
 //    return view('home');
 //});
 
+Route::resource('roles', 'RoleController');
+
 Route::group([
     'prefix' => 'users'
 ], function () {
