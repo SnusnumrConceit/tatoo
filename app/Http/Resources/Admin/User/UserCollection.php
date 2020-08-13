@@ -6,6 +6,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class UserCollection extends ResourceCollection
 {
+    public static $wrap = 'users';
+
     /**
      * Transform the resource collection into an array.
      *
@@ -14,9 +16,11 @@ class UserCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        return [
-            'data' => $this->collection,
-            'last_page' => $this->lastPage()
-        ];
+        return $this->collection->toArray();
+    }
+
+    public function withResponse($request, $response)
+    {
+        $response->setStatusCode(200);
     }
 }

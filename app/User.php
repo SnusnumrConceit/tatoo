@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use App\Model\Order;
 use App\Models\Role;
 use App\Models\Permission;
@@ -39,12 +40,45 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    
+
+    /**
+     * Get the full name includes last name and first name
+     *
+     * @return string
+     */
     public function getFullNameAttribute()
     {
         return trim($this->last_name . ' ' . $this->first_name);
     }
-    
+
+    /**
+     * Get the formatted birthday attribute
+     *
+     * @return string
+     */
+    public function getDisplayBirthdayAttribute()
+    {
+        if (now()->diffInDays($this->birthday) > 0) {
+            return Carbon::parse($this->birthday)->format('d.m.Y');
+        }
+
+        return Carbon::parse($this->birthday)->diffForHumans();
+    }
+
+    /**
+     * Get the formatted created_at attribute
+     *
+     * @return string
+     */
+    public function getDisplayCreatedAtAttribute()
+    {
+        if (now()->diffInDays($this->created_at) > 0) {
+            return Carbon::parse($this->created_at)->format('d.m.Y');
+        }
+
+        return Carbon::parse($this->created_at)->diffForHumans();
+    }
+
     /**
      * Role O-2-O relation
      *
@@ -54,7 +88,7 @@ class User extends Authenticatable
     {
         return $this->hasOne(Role::class, 'name', 'role_name');
     }
-    
+
     /**
      * Permissions M-2-M relation
      *
@@ -68,7 +102,7 @@ class User extends Authenticatable
             'id', 'name'
         );
     }
-    
+
     /**
      * Role permissions M-2-M through role relation
      *
@@ -82,7 +116,7 @@ class User extends Authenticatable
             'role_name', 'name'
         );
     }
-    
+
     /**
      * Order O-2-M relation
      *
@@ -92,7 +126,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
-    
+
     /**
      * Check user has permission for action
      *
@@ -104,7 +138,7 @@ class User extends Authenticatable
     {
         return $this->hasRolePermission($permission) || $this->hasExtendedPermission($permission);
     }
-    
+
     /**
      * Check user has extended permission for action
      *
@@ -116,7 +150,7 @@ class User extends Authenticatable
     {
         return $this->permissions->contains('name', $permission);
     }
-    
+
     /**
      * Check user's role has permission for action
      *

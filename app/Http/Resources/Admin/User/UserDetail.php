@@ -2,11 +2,13 @@
 
 namespace App\Http\Resources\Admin\User;
 
-use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Admin\Order\OrderCollection;
 
-class User extends JsonResource
+class UserDetail extends JsonResource
 {
+    public static $wrap = 'user';
+
     /**
      * Transform the resource into an array.
      *
@@ -17,10 +19,17 @@ class User extends JsonResource
     {
         return [
             'id'            => $this->id,
-            'name'          => $this->full_name,
+            'full_name'     => $this->full_name,
             'email'         => $this->email,
             'birthday'      => $this->display_birthday,
             'created_at'    => $this->display_created_at,
+            'permissions'   => $this->permissions,
+            'orders'        => new OrderCollection($this->orders()->paginate())
         ];
+    }
+
+    public function withResponse($request, $response)
+    {
+        $response->setStatusCode(200);
     }
 }
